@@ -1,0 +1,229 @@
+.page {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+}
+
+/* Left Panel */
+.leftPanel {
+    background: linear-gradient(150deg, #0d3530 0%, #2F8F83 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 48px;
+}
+
+.branding {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.brandLogoImage {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.brandName {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.brandTagline {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.bgShapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.circle1 {
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.circle2 {
+    position: absolute;
+    bottom: -60px;
+    left: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* Right Panel */
+.rightPanel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 48px 32px;
+}
+
+.loginCard {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(47, 143, 131, 0.12);
+    border: 1px solid var(--border);
+}
+
+.cardHeader {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.lockIcon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #2F8F83, #1a5c55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(47, 143, 131, 0.3);
+}
+
+.loginTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 6px;
+}
+
+.loginSub {
+    font-size: 14px;
+    color: var(--gray);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.inputWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 14px;
+    color: #aaa;
+    pointer-events: none;
+}
+
+.inputPadded {
+    padding-left: 40px !important;
+}
+
+.inputPaddedRight {
+    padding-right: 44px !important;
+}
+
+.showPassBtn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.showPassBtn:hover {
+    color: #2F8F83;
+}
+
+.hintBox {
+    background: rgba(47, 143, 131, 0.06);
+    border: 1px solid rgba(47, 143, 131, 0.15);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #666;
+}
+
+.hintBox code {
+    background: rgba(47, 143, 131, 0.12);
+    color: #2F8F83;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255, 255, 255, 0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        grid-template-columns: 1fr;
+    }
+
+    .leftPanel {
+        display: none;
+    }
+
+    .rightPanel {
+        padding: 40px 16px;
+    }
+
+    .loginCard {
+        box-shadow: none;
+        border: none;
+        background: transparent;
+    }
+}

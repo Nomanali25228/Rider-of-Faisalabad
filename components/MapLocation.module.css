@@ -1,0 +1,88 @@
+.wrapper {
+    width: 100%;
+}
+
+.mapCard {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 24px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(47, 143, 131, 0.1);
+    border: 1px solid rgba(47, 143, 131, 0.1);
+}
+
+.mapFrame {
+    height: 340px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 16px 0 16px 16px;
+}
+
+.info {
+    padding: 28px 24px 28px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #222;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.list li a {
+    color: #2F8F83;
+    text-decoration: none;
+}
+
+.icon {
+    color: #2F8F83;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 16px;
+}
+
+.coverage {
+    font-size: 13px;
+    color: #777;
+    background: rgba(47, 143, 131, 0.06);
+    padding: 12px 16px;
+    border-radius: 10px;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .mapCard {
+        grid-template-columns: 1fr;
+    }
+
+    .mapFrame {
+        margin: 16px;
+        height: 260px;
+    }
+
+    .info {
+        padding: 0 16px 20px;
+    }
+}

@@ -1,0 +1,407 @@
+.wrapper {
+    width: 100%;
+}
+
+/* Table */
+.tableWrap {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(47, 143, 131, 0.12);
+    box-shadow: 0 4px 24px rgba(47, 143, 131, 0.06);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 700px;
+}
+
+.table thead tr {
+    background: #f8fbfb;
+    border-bottom: 1px solid rgba(47, 143, 131, 0.1);
+}
+
+.table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+}
+
+.tableRow {
+    border-bottom: 1px solid rgba(47, 143, 131, 0.06);
+    transition: background 0.2s ease;
+}
+
+.tableRow:hover {
+    background: rgba(47, 143, 131, 0.03);
+}
+
+.tableRow:last-child {
+    border-bottom: none;
+}
+
+.table td {
+    padding: 14px 16px;
+    vertical-align: middle;
+}
+
+.trackCode {
+    font-size: 11px;
+    background: rgba(47, 143, 131, 0.08);
+    color: #2F8F83;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-weight: 700;
+}
+
+.customerCell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.customerCell strong {
+    color: #222;
+    font-size: 14px;
+}
+
+.customerCell span {
+    color: #888;
+    font-size: 12px;
+}
+
+.parcelType {
+    font-size: 13px;
+    color: #555;
+}
+
+.deliveryBadge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(47, 143, 131, 0.1);
+    color: #2F8F83;
+}
+
+.deliveryBadge.urgent {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.deliveryBadge.sameDay {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.statusSelect {
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    min-width: 100px;
+    border-radius: 100px;
+}
+
+.date {
+    font-size: 12px;
+    color: #888;
+}
+
+.emptyRow {
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 15px;
+}
+
+/* Action Buttons */
+.actionBtns {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.iconBtn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(47, 143, 131, 0.2);
+    background: white;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.iconBtn:hover {
+    background: rgba(47, 143, 131, 0.1);
+    border-color: #2F8F83;
+    color: #2F8F83;
+}
+
+.voiceBtn {
+    color: #7c3aed;
+    border-color: rgba(124, 58, 237, 0.2);
+}
+
+.voiceBtn:hover {
+    background: rgba(124, 58, 237, 0.1);
+    border-color: #7c3aed;
+}
+
+.acceptBtn {
+    color: #16a34a;
+    border-color: rgba(22, 163, 74, 0.2);
+}
+
+.acceptBtn:hover {
+    background: rgba(22, 163, 74, 0.1);
+    border-color: #16a34a;
+}
+
+.rejectBtn {
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.2);
+}
+
+.rejectBtn:hover {
+    background: rgba(220, 38, 38, 0.1);
+    border-color: #dc2626;
+}
+
+.cancelledLabel {
+    font-size: 11px;
+    font-weight: 700;
+    color: #dc2626;
+    background: #fff5f5;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+/* Detail Panel */
+.detailPanel {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid rgba(47, 143, 131, 0.12);
+    padding: 24px;
+    margin-top: 16px;
+    box-shadow: 0 4px 24px rgba(47, 143, 131, 0.08);
+}
+
+.detailHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(47, 143, 131, 0.1);
+}
+
+.detailHeader h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #222;
+    font-family: 'Outfit', sans-serif;
+}
+
+.closeBtn {
+    background: rgba(47, 143, 131, 0.1);
+    border: none;
+    color: #2F8F83;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.detailGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.detailFull {
+    grid-column: 1 / -1;
+}
+
+.detailItem {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detailLabel {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.detailItem strong,
+.detailItem span,
+.detailItem a {
+    font-size: 14px;
+    color: #333;
+}
+
+.detailItem a {
+    color: #2F8F83;
+    text-decoration: none;
+}
+
+@media (max-width: 640px) {
+    .detailGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Rejection Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.modalContent {
+    background: white;
+    width: 90%;
+    max-width: 480px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modalHeader {
+    background: #fff5f5;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #c53030;
+    border-bottom: 1px solid #fee2e2;
+}
+
+.modalHeader h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+    font-family: 'Outfit', sans-serif;
+}
+
+.modalBody {
+    padding: 24px;
+}
+
+.instruction {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 12px;
+}
+
+.rejectionInput {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 2px solid #eee;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+}
+
+.rejectionInput:focus {
+    border-color: #feb2b2;
+}
+
+.suggestionsTitle {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+}
+
+.suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.suggestionBtn {
+    background: #f7f9f9;
+    border: 1px solid #eee;
+    padding: 6px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggestionBtn:hover {
+    background: #fff5f5;
+    border-color: #feb2b2;
+    color: #c53030;
+}
+
+.modalFooter {
+    padding: 20px 24px;
+    background: #f9fbfb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.cancelBtn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.confirmBtn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    background: #c53030;
+    color: white;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(197, 48, 48, 0.2);
+}
+
+.confirmBtn:hover {
+    background: #9b2c2c;
+    transform: translateY(-1px);
+}

@@ -1,0 +1,285 @@
+.dashboard {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    padding-top: 0;
+}
+
+/* Header */
+.dbHeader {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(47, 143, 131, 0.06);
+}
+
+.dbHeaderLeft {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.dbLogo {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.dbLogoImg {
+    object-fit: contain;
+}
+
+.dbTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--dark);
+    margin: 0;
+}
+
+.dbSub {
+    font-size: 12px;
+    color: var(--gray-light);
+    margin: 0;
+}
+
+.dbHeaderRight {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.refreshBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    background: rgba(47, 143, 131, 0.08);
+    border: 1px solid rgba(47, 143, 131, 0.15);
+    color: #2F8F83;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.refreshBtn:hover {
+    background: rgba(47, 143, 131, 0.15);
+}
+
+.spinning {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.logoutBtn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    color: #dc2626;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+    background: rgba(220, 38, 38, 0.15);
+}
+
+/* Main */
+.dbMain {
+    padding: 28px;
+    flex: 1;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Stats */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.statCard {
+    background: white;
+    border-radius: 18px;
+    padding: 20px 20px 20px 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 16px rgba(47, 143, 131, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+    transition: all 0.3s ease;
+}
+
+.statCard:hover {
+    box-shadow: 0 12px 40px rgba(47, 143, 131, 0.12);
+}
+
+.statIcon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--stat-color, #2F8F83) 12%, white);
+    color: var(--stat-color, #2F8F83);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.statInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.statNum {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--dark);
+    line-height: 1;
+}
+
+.statLabel {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 500;
+}
+
+.statBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--stat-color, #2F8F83);
+    opacity: 0.3;
+}
+
+/* Orders Section */
+.ordersSection {
+    background: white;
+    border-radius: 20px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgba(47, 143, 131, 0.06);
+}
+
+.ordersSectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.sectionTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--dark);
+}
+
+.filterTabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filterTab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 100px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--gray);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filterTab:hover {
+    border-color: #2F8F83;
+    color: #2F8F83;
+}
+
+.filterTabActive {
+    background: #2F8F83;
+    color: white;
+    border-color: #2F8F83;
+}
+
+.tabCount {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 1px 7px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.filterTab:not(.filterTabActive) .tabCount {
+    background: rgba(47, 143, 131, 0.1);
+    color: #2F8F83;
+}
+
+@media (max-width: 1024px) {
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .dbMain {
+        padding: 16px;
+    }
+
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .statNum {
+        font-size: 24px;
+    }
+
+    .ordersSectionHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

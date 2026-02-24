@@ -1,0 +1,390 @@
+.whyGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+}
+
+.whyCard {
+    background: var(--bg);
+    border-radius: 20px;
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.whyCard:hover {
+    background: white;
+    box-shadow: 0 12px 40px rgba(47, 143, 131, 0.1);
+    transform: translateY(-4px);
+}
+
+.whyIcon {
+    font-size: 36px;
+    margin-bottom: 14px;
+}
+
+.whyTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 8px;
+}
+
+.whyDesc {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.6;
+}
+
+/* Services Grid */
+.servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+}
+
+/* Stats Banner */
+.statsBanner {
+    background: linear-gradient(135deg, #0d3530 0%, #2F8F83 100%);
+    padding: 60px 0;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    text-align: center;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 24px 16px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statItem:last-child {
+    border-right: none;
+}
+
+.statValue {
+    font-family: 'Outfit', sans-serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: white;
+    line-height: 1;
+}
+
+.statLabel {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 500;
+}
+
+/* Riders */
+.ridersGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.riderCard {
+    background: white;
+    border-radius: 28px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.riderCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--rider-color, #2F8F83);
+}
+
+.riderCard:hover {
+    box-shadow: 0 20px 60px rgba(47, 143, 131, 0.12);
+    border-color: color-mix(in srgb, var(--rider-color, #2F8F83) 30%, transparent);
+}
+
+.riderAvatar {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 24px;
+    overflow: hidden;
+    margin: 0 auto 24px;
+    background: #f7f9f9;
+    border: 1px solid var(--border);
+}
+
+.riderImageWrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.riderImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.riderCard:hover .riderImage {
+    transform: scale(1.08);
+}
+
+.riderBadge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: var(--rider-color, #2F8F83);
+    color: white;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.riderName {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 6px;
+}
+
+.riderRole {
+    font-size: 15px;
+    color: var(--rider-color, #2F8F83);
+    font-weight: 700;
+    margin-bottom: 24px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.riderStats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.riderStat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray);
+    background: #f8fafc;
+    padding: 10px 8px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+}
+
+.riderStat svg {
+    color: var(--rider-color, #2F8F83);
+    flex-shrink: 0;
+}
+
+/* Order Section */
+.orderSection {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--secondary-light) 100%);
+}
+
+.orderGrid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 60px;
+    align-items: start;
+}
+
+.orderFeatures {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+    list-style: none;
+    padding: 0;
+}
+
+.orderFeatures li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: var(--gray);
+    font-weight: 500;
+}
+
+.formCard {
+    background: white;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(47, 143, 131, 0.12);
+    border: 1px solid var(--border);
+}
+
+.formCardTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--dark);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Order Notice Styles */
+.orderNotice {
+    display: flex;
+    gap: 16px;
+    background: white;
+    padding: 18px;
+    border-radius: 16px;
+    border-left: 4px solid var(--primary);
+    margin-top: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.noticeIcon {
+    background: rgba(47, 143, 131, 0.1);
+    color: var(--primary);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.noticeContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.urduText {
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Sans Arabic', 'Inter', sans-serif;
+    font-size: 19px;
+    color: #222;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.5;
+    direction: rtl;
+    text-align: left;
+}
+
+.englishText {
+    font-size: 14px;
+    color: var(--gray);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.urduSlogan {
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Sans Arabic', 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--primary);
+    font-weight: 600;
+    margin-top: 20px;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+@media (max-width: 992px) {
+    .orderGrid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .formCard {
+        padding: 24px 16px;
+    }
+
+    .orderNotice {
+        padding: 14px;
+        gap: 12px;
+    }
+
+    .urduText {
+        font-size: 17px;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .servicesGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statItem {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .statItem:last-child {
+        border-bottom: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .whyGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ridersGrid {
+        grid-template-columns: 1fr;
+        max-width: 440px;
+    }
+
+    .orderGrid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .whyGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .servicesGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
