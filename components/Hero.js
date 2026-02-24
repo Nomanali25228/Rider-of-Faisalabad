@@ -118,12 +118,10 @@ export default function Hero() {
                     {floatingStats.map(({ icon, value, label, color }, i) => (
                         <motion.div
                             key={label}
-                            className={styles.statCard}
+                            className={`${styles.statCard} ${styles[`statCard${i}`]}`}
                             style={{
                                 '--delay': `${i * 0.3}s`,
-                                top: i === 0 ? '8%' : i === 1 ? '50%' : '82%',
-                                right: i === 1 ? '-10%' : '5%',
-                                left: i === 0 ? '-5%' : i === 2 ? '-10%' : 'auto'
+                                '--stat-color': color
                             }}
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}

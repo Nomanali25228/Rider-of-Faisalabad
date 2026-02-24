@@ -6,11 +6,84 @@
 
 /* CTA Strip */
 .ctaStrip {
-    background: linear-gradient(135deg, #2F8F83 0%, #1a5c55 100%);
-    padding: 48px 0;
+    position: relative;
+    background: linear-gradient(135deg, #0d3530 0%, #2F8F83 100%);
+    padding: 60px 0;
+    overflow: hidden;
+}
+
+.ctaShapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shapeRing {
+    position: absolute;
+    top: 50%;
+    left: 85%;
+    width: 400px;
+    height: 400px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotate 30s linear infinite;
+}
+
+.shapeRing2 {
+    position: absolute;
+    top: 50%;
+    left: 85%;
+    width: 250px;
+    height: 250px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: rotate 20s linear reverse infinite;
+}
+
+.shapeOrb {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(244, 197, 66, 0.1) 0%, rgba(244, 197, 66, 0) 70%);
+    border-radius: 50%;
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.6;
+    }
 }
 
 .ctaInner {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -18,22 +91,29 @@
     flex-wrap: wrap;
 }
 
+.ctaText {
+    flex: 1;
+    min-width: 300px;
+}
+
 .ctaTitle {
     font-family: 'Outfit', sans-serif;
-    font-size: 26px;
+    font-size: 32px;
     font-weight: 800;
     color: white;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
 }
 
 .ctaSub {
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    max-width: 450px;
 }
 
 .ctaButtons {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     flex-wrap: wrap;
 }
 

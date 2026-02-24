@@ -550,7 +550,11 @@ select.form-input {
 
 @media (max-width: 768px) {
   .section {
-    padding: 56px 0;
+    padding: 48px 0;
+  }
+
+  .section-sm {
+    padding: 32px 0;
   }
 
   .grid-2 {
@@ -565,6 +569,10 @@ select.form-input {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .section-title {
+    font-size: clamp(24px, 6vw, 32px);
+  }
+
   .section-subtitle {
     font-size: 15px;
   }
@@ -572,7 +580,7 @@ select.form-input {
 
 @media (max-width: 480px) {
   .container {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 
   .grid-4 {
@@ -582,5 +590,11 @@ select.form-input {
   .btn {
     padding: 12px 22px;
     font-size: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .section {
+    padding: 40px 0;
   }
 }

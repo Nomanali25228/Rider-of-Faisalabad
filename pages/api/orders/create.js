@@ -86,7 +86,7 @@ async function sendOrderEmails(order) {
         },
     });
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rider-of-faisalabad.vercel.app';
     const trackingLink = `${siteUrl}/track-order?id=${order.trackingId}`;
 
     // 1. Admin Email (Notification)
@@ -144,7 +144,7 @@ async function sendOrderEmails(order) {
                         <p style="font-size:13px; color:#888;">If you have any questions, feel free to reply to this email or contact us via WhatsApp.</p>
                     </div>
                     <div style="background:#f4f4f4; padding:20px; text-align:center; font-size:12px; color:#999;">
-                        &copy; ${new Date().getFullYear()} Rider of Faisalabad. All rights reserved.
+                        &copy; 2021 Rider of Faisalabad. All rights reserved.
                     </div>
                 </div>
             `,

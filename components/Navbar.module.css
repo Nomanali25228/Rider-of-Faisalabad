@@ -44,6 +44,8 @@
 }
 
 .mainLogo {
+    width: 100% !important;
+    height: 100% !important;
     object-fit: contain;
 }
 
@@ -165,8 +167,9 @@
     background: rgba(47, 143, 131, 0.12);
     border: none;
     color: #2F8F83;
-    padding: 8px;
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -212,17 +215,29 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+}
+
+.drawerHeader .logoImage {
+    width: 44px;
+    height: 44px;
+}
+
+.drawerHeader .logoText {
+    font-size: 14px;
+    flex: 1;
 }
 
 .drawerHeader button {
     background: rgba(255, 255, 255, 0.2);
     border: none;
     border-radius: 8px;
-    padding: 8px;
+    padding: 6px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .drawerLinks {
@@ -273,5 +288,34 @@
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .inner {
+        height: 64px;
+        gap: 12px;
+    }
+
+    .logoImage {
+        width: 48px;
+        height: 48px;
+    }
+
+    .logoText {
+        font-size: 15px;
+    }
+
+    .logoText span {
+        display: block;
+        /* Stacks 'of Faisalabad' below 'Rider' on very small screens if needed */
+        font-size: 11px;
+        line-height: 1;
+        margin-top: -2px;
+    }
+
+    .mobileToggle {
+        width: 40px;
+        height: 40px;
     }
 }

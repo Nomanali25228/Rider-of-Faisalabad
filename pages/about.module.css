@@ -277,8 +277,23 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
     .coverageGrid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
+    }
+
+    .areaCard {
+        padding: 24px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mStat {
+        padding: 12px 14px;
+        min-width: 70px;
+    }
+
+    .mStat strong {
+        font-size: 20px;
     }
 }

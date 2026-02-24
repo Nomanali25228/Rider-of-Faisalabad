@@ -110,7 +110,7 @@ async function sendRejectedEmail(order, reason) {
 
 async function sendDeliveredEmail(order) {
     const transporter = await getTransporter();
-    const feedbackUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/track-order?id=${order.trackingId}`;
+    const feedbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rider-of-faisalabad.vercel.app'}/track-order?id=${order.trackingId}`;
 
     await transporter.sendMail({
         from: `"Rider of Faisalabad" <${process.env.SMTP_USER}>`,

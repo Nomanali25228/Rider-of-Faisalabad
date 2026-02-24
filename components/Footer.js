@@ -28,21 +28,34 @@ export default function Footer({ isAdmin }) {
             {/* CTA Strip */}
             {!isAdmin && (
                 <div className={styles.ctaStrip}>
+                    {/* Animated Background Elements */}
+                    <div className={styles.ctaShapes}>
+                        <div className={styles.shapeRing} />
+                        <div className={styles.shapeRing2} />
+                        <div className={styles.shapeOrb} />
+                    </div>
+
                     <div className="container">
-                        <div className={styles.ctaInner}>
-                            <div>
+                        <motion.div
+                            className={styles.ctaInner}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6 }}
+                        >
+                            <div className={styles.ctaText}>
                                 <h3 className={styles.ctaTitle}>Ready to Send a Parcel?</h3>
                                 <p className={styles.ctaSub}>Fast, secure & trusted delivery — anywhere in Pakistan</p>
                             </div>
                             <div className={styles.ctaButtons}>
-                                <Link href="/contact" className="btn btn-primary btn-lg" id="footer-book-btn">
-                                    Book Delivery
+                                <Link href="/#quick-order" className="btn btn-primary btn-lg" id="footer-book-btn">
+                                    <FiArrowRight size={18} /> Order Now
                                 </Link>
                                 <Link href="/track-order" className="btn btn-secondary btn-lg" id="footer-track-btn">
                                     Track Order
                                 </Link>
                             </div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             )}
@@ -150,10 +163,7 @@ export default function Footer({ isAdmin }) {
                 <div className="container">
                     <div className={styles.bottomInner}>
                         <p className={styles.copyright}>
-                            &copy; {new Date().getFullYear()} Rider of Faisalabad. All rights reserved.
-                        </p>
-                        <p className={styles.devBy}>
-                            Developed with ❤️ by <strong>Waqas Ahmad</strong>
+                            &copy; 2021 Rider of Faisalabad. All rights reserved.
                         </p>
                     </div>
                 </div>

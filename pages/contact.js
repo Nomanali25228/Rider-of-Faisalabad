@@ -1,8 +1,8 @@
 import Head from 'next/head';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiPhone, FiMail, FiMapPin, FiInstagram, FiSend, FiMic, FiUpload } from 'react-icons/fi';
+import { FiPhone, FiMail, FiMapPin, FiInstagram, FiSend, FiMic, FiUpload, FiSquare, FiTrash2 } from 'react-icons/fi';
 import MapLocation from '../components/MapLocation';
 import styles from './contact.module.css';
 
@@ -18,7 +18,78 @@ export default function ContactPage() {
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [voiceFile, setVoiceFile] = useState(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingTime, setRecordingTime] = useState(0);
+    const [audioUrl, setAudioUrl] = useState(null);
+    const mediaRecorderRef = useRef(null);
+    const chunksRef = useRef([]);
+    const timerRef = useRef(null);
     const voiceRef = useRef();
+
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearInterval(timerRef.current);
+            if (audioUrl) URL.revokeObjectURL(audioUrl);
+        };
+    }, [audioUrl]);
+
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = mediaRecorder;
+            chunksRef.current = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) chunksRef.current.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+                const url = URL.createObjectURL(blob);
+                const file = new File([blob], `voice-note-contact-${Date.now()}.webm`, { type: 'audio/webm' });
+
+                setAudioUrl(url);
+                setVoiceFile(file);
+                stream.getTracks().forEach(track => track.stop());
+            };
+
+            mediaRecorder.start();
+            setIsRecording(true);
+            setRecordingTime(0);
+
+            timerRef.current = setInterval(() => {
+                setRecordingTime(prev => prev + 1);
+            }, 1000);
+
+            toast.success('Recording started...');
+        } catch (err) {
+            console.error('Recording error:', err);
+            toast.error('Could not access microphone.');
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && isRecording) {
+            mediaRecorderRef.current.stop();
+            setIsRecording(false);
+            clearInterval(timerRef.current);
+            toast.success('Recording stopped.');
+        }
+    };
+
+    const deleteRecording = () => {
+        if (audioUrl) URL.revokeObjectURL(audioUrl);
+        setAudioUrl(null);
+        setVoiceFile(null);
+        setRecordingTime(0);
+    };
+
+    const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
 
     const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
 
@@ -30,14 +101,23 @@ export default function ContactPage() {
         }
         setLoading(true);
         try {
+            const formData = new FormData();
+            Object.entries(form).forEach(([key, val]) => {
+                formData.append(key, val);
+            });
+            if (voiceFile) {
+                formData.append('voiceNote', voiceFile);
+            }
+
             const res = await fetch('/api/contact', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(form),
+                body: formData,
             });
             const data = await res.json();
             if (data.success) {
                 setSubmitted(true);
+                setForm({ name: '', email: '', phone: '', subject: '', message: '' });
+                deleteRecording();
                 toast.success('Message sent! We\'ll respond soon.');
             } else {
                 toast.error(data.message || 'Failed to send.');
@@ -156,13 +236,39 @@ export default function ContactPage() {
                                                 <label className="form-label" htmlFor="contact-message">Message <span style={{ color: 'red' }}>*</span></label>
                                                 <textarea id="contact-message" name="message" className="form-input" rows={4} placeholder="Write your message here..." value={form.message} onChange={handleChange} required />
                                             </div>
-                                            {/* Voice Note */}
+                                            {/* Live Voice Note */}
                                             <div className="form-group">
-                                                <label className="form-label"><FiMic size={14} /> Voice Note (Optional)</label>
-                                                <div className={styles.voiceUpload} onClick={() => voiceRef.current?.click()}>
-                                                    <FiUpload size={18} />
-                                                    <span>{voiceFile ? voiceFile.name : 'Upload voice message'}</span>
-                                                    <input ref={voiceRef} type="file" accept="audio/*" style={{ display: 'none' }} onChange={e => setVoiceFile(e.target.files[0])} />
+                                                <label className="form-label"><FiMic size={14} /> Live Voice Note (Optional)</label>
+                                                <div className={`${styles.voiceRecorder} ${isRecording ? styles.recorderActive : ''}`}>
+                                                    {!audioUrl ? (
+                                                        <>
+                                                            <button
+                                                                type="button"
+                                                                className={`${styles.micBtn} ${isRecording ? styles.micBtnRecording : ''}`}
+                                                                onClick={isRecording ? stopRecording : startRecording}
+                                                                title={isRecording ? "Stop Recording" : "Start Recording"}
+                                                            >
+                                                                {isRecording ? <FiSquare size={18} /> : <FiMic size={20} />}
+                                                            </button>
+                                                            <div className={styles.recordingInfo}>
+                                                                {isRecording ? (
+                                                                    <>
+                                                                        <span className={styles.timer}>{formatTime(recordingTime)}</span>
+                                                                        <span className={styles.recordingText}>Recording live...</span>
+                                                                    </>
+                                                                ) : (
+                                                                    <span className={styles.recordingText}>Click mic to record a message</span>
+                                                                )}
+                                                            </div>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <audio src={audioUrl} controls style={{ height: 32, flex: 1, maxWidth: 'calc(100% - 40px)' }} />
+                                                            <button type="button" className={styles.deleteVoice} onClick={deleteRecording} title="Delete recording">
+                                                                <FiTrash2 size={18} />
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                             <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }} disabled={loading} id="contact-submit-btn">
