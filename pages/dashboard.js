@@ -104,11 +104,14 @@ export default function DashboardPage() {
             if (data.success) {
                 setOrders(prev => prev.map(o => (o._id === orderId || o.trackingId === orderId) ? { ...o, status: newStatus, rejectionReason } : o));
                 toast.success(`Status updated to ${newStatus}`);
+                return true;
             } else {
                 toast.error(data.message || 'Failed to update status.');
+                return false;
             }
         } catch (err) {
             toast.error('Failed to update status.');
+            return false;
         }
     };
 

@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer';
 import { IncomingForm } from 'formidable';
 import path from 'path';
 import fs from 'fs';
@@ -50,8 +51,9 @@ export default async function handler(req, res) {
             const transporter = nodemailer.createTransport({
                 host: process.env.SMTP_HOST,
                 port: Number(process.env.SMTP_PORT) || 587,
-                secure: false, // true for 465, false for other ports
+                secure: process.env.SMTP_PORT == 465,
                 auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+                tls: { rejectUnauthorized: false }
             });
 
             const voiceUrl = voiceNote ? `${process.env.NEXT_PUBLIC_SITE_URL || ''}/uploads/${path.basename(voiceNote.filepath)}` : null;

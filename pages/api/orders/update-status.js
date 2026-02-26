@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer';
 import { updateOrderStatus, getOrderById } from '../../../lib/ordersStore';
 
 export default async function handler(req, res) {
@@ -22,15 +23,15 @@ export default async function handler(req, res) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
+        // Only proceed if status is actually changing
+        if (currentOrder.status === status) {
+            return res.status(200).json({ success: true, message: 'Status is already set to ' + status });
+        }
+
         // Prevent updating if already Rejected
         // Prevent updating if already in a final state
         if (currentOrder.status === 'Rejected' || currentOrder.status === 'Delivered') {
             return res.status(400).json({ success: false, message: `This order is already ${currentOrder.status.toLowerCase()} and cannot be changed.` });
-        }
-
-        // Only proceed if status is actually changing
-        if (currentOrder.status === status) {
-            return res.status(200).json({ success: true, message: 'Status is already set to ' + status });
         }
 
         const extraData = status === 'Rejected' ? { rejectionReason } : {};
@@ -41,15 +42,20 @@ export default async function handler(req, res) {
 
         const order = getOrderById(orderId);
 
-        // Send status update emails
-        if (process.env.SMTP_HOST && order && order.email) {
-            if (status === 'Accepted') {
-                await sendAcceptedEmail(order);
-            } else if (status === 'Rejected') {
-                await sendRejectedEmail(order, rejectionReason);
-            } else if (status === 'Delivered') {
-                await sendDeliveredEmail(order);
+        // Send status update emails (Wrapped in try-catch so SMTP errors don't break status updates)
+        try {
+            if (process.env.SMTP_HOST && order && order.email) {
+                if (status === 'Accepted') {
+                    await sendAcceptedEmail(order);
+                } else if (status === 'Rejected') {
+                    await sendRejectedEmail(order, rejectionReason);
+                } else if (status === 'Delivered') {
+                    await sendDeliveredEmail(order);
+                }
             }
+        } catch (emailErr) {
+            console.error('Email notification failed for status:', status, emailErr);
+            // We don't return error here because the status WAS updated in the system successfully
         }
 
         return res.status(200).json({ success: true, message: `Status updated to ${status}` });
@@ -60,12 +66,18 @@ export default async function handler(req, res) {
 }
 
 async function getTransporter() {
-    const nodemailer = (await import('nodemailer')).default;
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
-        secure: false,
-        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+        secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS
+        },
+        tls: {
+            rejectUnauthorized: false
+        },
+        pool: true // Use pooled connections for better performance on status updates
     });
 }
 

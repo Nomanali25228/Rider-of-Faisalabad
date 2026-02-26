@@ -59,21 +59,13 @@ export default function AdminOrderTable({ orders = [], onStatusChange }) {
 
         setUpdating(orderId);
         try {
-            const res = await fetch('/api/orders/update-status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, status: newStatus, rejectionReason: reason }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                toast.success(`Order status updated to ${newStatus}`);
-                onStatusChange?.(orderId, newStatus, reason);
+            // Let the parent (Dashboard) handle the actual API call
+            const success = await onStatusChange?.(orderId, newStatus, reason);
+            if (success) {
                 setShowRejectModal(false);
-            } else {
-                toast.error('Failed to update status.');
             }
-        } catch {
-            toast.error('Network error.');
+        } catch (err) {
+            console.error('Update failed:', err);
         } finally {
             setUpdating(null);
         }

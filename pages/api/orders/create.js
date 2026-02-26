@@ -1,3 +1,4 @@
+import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 import { IncomingForm } from 'formidable';
 import path from 'path';
@@ -75,15 +76,15 @@ export default async function handler(req, res) {
 async function sendOrderEmails(order) {
     if (!process.env.SMTP_HOST) return;
 
-    const nodemailer = (await import('nodemailer')).default;
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
-        secure: false,
+        secure: process.env.SMTP_PORT == 465,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
         },
+        tls: { rejectUnauthorized: false }
     });
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://rider-of-faisalabad.vercel.app';
