@@ -95,7 +95,7 @@ export default function Footer({ isAdmin }) {
                                     <FiInstagram size={18} />
                                 </a>
                                 <a
-                                    href="https://www.facebook.com/profile.php?id=61566378457008"
+                                    href="https://www.facebook.com/profile.php?id=61576937362242"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className={styles.socialBtn}
