@@ -17,6 +17,7 @@ export default function ContactPage() {
     const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [errors, setErrors] = useState({});
     const [voiceFile, setVoiceFile] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -98,14 +99,25 @@ export default function ContactPage() {
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const handleChange = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
+    const handleChange = e => {
+        const { name, value } = e.target;
+        setForm(p => ({ ...p, [name]: value }));
+        if (errors[name]) setErrors(p => ({ ...p, [name]: '' }));
+    };
 
     const handleSubmit = async e => {
         e.preventDefault();
-        if (!form.name || !form.message) {
-            toast.error('Please fill Name and Message fields.');
+        const newErrors = {};
+        if (!form.name.trim()) newErrors.name = '👤 Please enter your name.';
+        if (!form.phone.trim()) newErrors.phone = '📞 Please enter your phone number.';
+        else if (!/^[0-9+\s()-]{7,15}$/.test(form.phone.trim())) newErrors.phone = '📞 Please enter a valid phone number.';
+        if (!form.message.trim()) newErrors.message = '✏️ Please write your message.';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
+        setErrors({});
         setLoading(true);
         try {
             const formData = new FormData();
@@ -224,11 +236,23 @@ export default function ContactPage() {
                                             <div className={styles.halfGrid}>
                                                 <div className="form-group">
                                                     <label className="form-label" htmlFor="contact-name">Name <span style={{ color: 'red' }}>*</span></label>
-                                                    <input id="contact-name" name="name" type="text" className="form-input" placeholder="Your name" value={form.name} onChange={handleChange} required />
+                                                    <input
+                                                        id="contact-name" name="name" type="text"
+                                                        className={`form-input ${errors.name ? styles.inputError : ''}`}
+                                                        placeholder="Your name"
+                                                        value={form.name} onChange={handleChange}
+                                                    />
+                                                    {errors.name && <span className={styles.errorMsg}>{errors.name}</span>}
                                                 </div>
                                                 <div className="form-group">
-                                                    <label className="form-label" htmlFor="contact-phone">Phone</label>
-                                                    <input id="contact-phone" name="phone" type="tel" className="form-input" placeholder="+92 300..." value={form.phone} onChange={handleChange} />
+                                                    <label className="form-label" htmlFor="contact-phone">Phone <span style={{ color: 'red' }}>*</span></label>
+                                                    <input
+                                                        id="contact-phone" name="phone" type="tel"
+                                                        className={`form-input ${errors.phone ? styles.inputError : ''}`}
+                                                        placeholder="+92 300..."
+                                                        value={form.phone} onChange={handleChange}
+                                                    />
+                                                    {errors.phone && <span className={styles.errorMsg}>{errors.phone}</span>}
                                                 </div>
                                             </div>
                                             <div className="form-group">
@@ -241,7 +265,13 @@ export default function ContactPage() {
                                             </div>
                                             <div className="form-group">
                                                 <label className="form-label" htmlFor="contact-message">Message <span style={{ color: 'red' }}>*</span></label>
-                                                <textarea id="contact-message" name="message" className="form-input" rows={4} placeholder="Write your message here..." value={form.message} onChange={handleChange} required />
+                                                <textarea
+                                                    id="contact-message" name="message"
+                                                    className={`form-input ${errors.message ? styles.inputError : ''}`}
+                                                    rows={4} placeholder="Write your message here..."
+                                                    value={form.message} onChange={handleChange}
+                                                />
+                                                {errors.message && <span className={styles.errorMsg}>{errors.message}</span>}
                                             </div>
                                             {/* Live Voice Note */}
                                             <div className="form-group">

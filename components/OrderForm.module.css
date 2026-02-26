@@ -21,6 +21,24 @@
     color: #e53e3e;
 }
 
+/* Validation */
+.errorMsg {
+    display: block;
+    font-size: 13px;
+    color: #dc2626;
+    font-weight: 500;
+    margin-top: 6px;
+    padding: 6px 12px;
+    background: #fef2f2;
+    border-radius: 8px;
+    border-left: 3px solid #dc2626;
+}
+
+.inputError {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
 .inputWithAction {
     display: flex;
     gap: 8px;

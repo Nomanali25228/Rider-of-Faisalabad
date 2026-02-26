@@ -27,7 +27,8 @@ export default function OrderForm({ compact = false }) {
     const [form, setForm] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [trackingId, setTrackingId] = useState(null);
-    const [mapMode, setMapMode] = useState(null); // 'pickup' or 'drop'
+    const [mapMode, setMapMode] = useState(null);
+    const [errors, setErrors] = useState({});
     const successRef = useRef(null);
 
     // Auto-scroll to success message
@@ -48,6 +49,7 @@ export default function OrderForm({ compact = false }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
     // Voice Recorder Logic
@@ -120,10 +122,23 @@ export default function OrderForm({ compact = false }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.fullName || !form.phone || !form.pickupAddress || !form.dropAddress || !form.parcelType) {
-            toast.error('Please fill all required fields.');
+        // Validate
+        const newErrors = {};
+        if (!form.fullName.trim()) newErrors.fullName = '👤 Please enter your full name.';
+        if (!form.phone.trim()) newErrors.phone = '📞 Please enter your phone number.';
+        else if (!/^[0-9+\s()-]{7,15}$/.test(form.phone.trim())) newErrors.phone = '📞 Please enter a valid phone number.';
+        if (!form.pickupAddress.trim()) newErrors.pickupAddress = '📍 Please enter the pickup address.';
+        if (!form.dropAddress.trim()) newErrors.dropAddress = '📍 Please enter the drop/delivery address.';
+        if (!form.parcelType) newErrors.parcelType = '📦 Please select a parcel type.';
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            // Scroll to first error
+            const firstErrorKey = Object.keys(newErrors)[0];
+            document.getElementById(firstErrorKey)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
+        setErrors({});
         setLoading(true);
         try {
             const formData = new FormData();
@@ -185,12 +200,12 @@ export default function OrderForm({ compact = false }) {
                         id="fullName"
                         name="fullName"
                         type="text"
-                        className="form-input"
+                        className={`form-input ${errors.fullName ? styles.inputError : ''}`}
                         placeholder="Your full name"
                         value={form.fullName}
                         onChange={handleChange}
-                        required
                     />
+                    {errors.fullName && <span className={styles.errorMsg}>{errors.fullName}</span>}
                 </div>
 
                 {/* Phone */}
@@ -202,12 +217,12 @@ export default function OrderForm({ compact = false }) {
                         id="phone"
                         name="phone"
                         type="tel"
-                        className="form-input"
+                        className={`form-input ${errors.phone ? styles.inputError : ''}`}
                         placeholder="+92 300 0000000"
                         value={form.phone}
                         onChange={handleChange}
-                        required
                     />
+                    {errors.phone && <span className={styles.errorMsg}>{errors.phone}</span>}
                 </div>
 
                 {/* Email */}
@@ -236,11 +251,10 @@ export default function OrderForm({ compact = false }) {
                             id="pickupAddress"
                             name="pickupAddress"
                             type="text"
-                            className="form-input"
+                            className={`form-input ${errors.pickupAddress ? styles.inputError : ''}`}
                             placeholder="Pickup location"
                             value={form.pickupAddress}
                             onChange={handleChange}
-                            required
                         />
                         <button
                             type="button"
@@ -251,6 +265,7 @@ export default function OrderForm({ compact = false }) {
                             <FiMap size={18} />
                         </button>
                     </div>
+                    {errors.pickupAddress && <span className={styles.errorMsg}>{errors.pickupAddress}</span>}
                 </div>
 
                 {/* Drop Address */}
@@ -263,11 +278,10 @@ export default function OrderForm({ compact = false }) {
                             id="dropAddress"
                             name="dropAddress"
                             type="text"
-                            className="form-input"
+                            className={`form-input ${errors.dropAddress ? styles.inputError : ''}`}
                             placeholder="Delivery destination"
                             value={form.dropAddress}
                             onChange={handleChange}
-                            required
                         />
                         <button
                             type="button"
@@ -278,6 +292,7 @@ export default function OrderForm({ compact = false }) {
                             <FiMap size={18} />
                         </button>
                     </div>
+                    {errors.dropAddress && <span className={styles.errorMsg}>{errors.dropAddress}</span>}
                 </div>
 
                 {/* Parcel Type */}
@@ -288,10 +303,9 @@ export default function OrderForm({ compact = false }) {
                     <select
                         id="parcelType"
                         name="parcelType"
-                        className="form-input"
+                        className={`form-input ${errors.parcelType ? styles.inputError : ''}`}
                         value={form.parcelType}
                         onChange={handleChange}
-                        required
                     >
                         <option value="" disabled>Select type...</option>
                         <option value="Documents">Documents</option>
@@ -302,6 +316,7 @@ export default function OrderForm({ compact = false }) {
                         <option value="Medicine">Medicine</option>
                         <option value="Other">Other</option>
                     </select>
+                    {errors.parcelType && <span className={styles.errorMsg}>{errors.parcelType}</span>}
                 </div>
 
                 {/* Delivery Type */}

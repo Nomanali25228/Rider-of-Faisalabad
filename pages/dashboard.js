@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiPackage, FiCheckCircle, FiClock, FiTruck, FiXCircle, FiRefreshCw, FiLogOut, FiMail } from 'react-icons/fi';
+import { FiPackage, FiCheckCircle, FiClock, FiTruck, FiXCircle, FiRefreshCw, FiLogOut, FiMail, FiStar } from 'react-icons/fi';
 import AdminOrderTable from '../components/AdminOrderTable';
 import AdminContactTable from '../components/AdminContactTable';
+import AdminReviewTable from '../components/AdminReviewTable';
 import styles from './dashboard.module.css';
 
 const statCards = [
@@ -19,9 +20,10 @@ const statCards = [
 export default function DashboardPage() {
     const [orders, setOrders] = useState([]);
     const [contacts, setContacts] = useState([]);
+    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
-    const [view, setView] = useState('orders'); // 'orders' or 'contacts'
+    const [view, setView] = useState('orders'); // 'orders', 'contacts', or 'reviews'
     const [isAuth, setIsAuth] = useState(false);
     const router = useRouter();
 
@@ -48,6 +50,13 @@ export default function DashboardPage() {
             if (contactsData.success) {
                 setContacts(contactsData.contacts);
             }
+
+            // Fetch Reviews
+            const reviewsRes = await fetch('/api/reviews/list');
+            const reviewsData = await reviewsRes.json();
+            if (reviewsData.success) {
+                setReviews(reviewsData.reviews);
+            }
         } catch (err) {
             toast.error('Network error while fetching data.');
         } finally {
@@ -70,11 +79,12 @@ export default function DashboardPage() {
         pending: orders.filter(o => o.status === 'Pending').length,
         inProgress: orders.filter(o => o.status === 'In Progress').length,
         contacts: contacts.length,
+        reviews: reviews.length,
     };
 
     const displayStatCards = [
         ...statCards.slice(0, 3),
-        { key: 'contacts', label: 'Inquiries', icon: <FiMail size={22} />, color: '#7c3aed' }
+        { key: 'contacts', label: 'Inquiries', icon: <FiMail size={22} />, color: '#7c3aed' },
     ];
 
     const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
@@ -163,7 +173,7 @@ export default function DashboardPage() {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.1, duration: 0.5 }}
                                 whileHover={{ y: -4 }}
-                                onClick={() => key === 'contacts' ? setView('contacts') : setView('orders')}
+                                onClick={() => key === 'contacts' ? setView('contacts') : key === 'reviews' ? setView('reviews') : setView('orders')}
                                 style={{ '--stat-color': color }}
                             >
                                 <div className={styles.statIcon}>{icon}</div>
@@ -192,6 +202,13 @@ export default function DashboardPage() {
                                 >
                                     <FiMail size={18} /> Inquiries
                                     {contacts.length > 0 && <span className={styles.viewBadge}>{contacts.length}</span>}
+                                </button>
+                                <button
+                                    className={`${styles.viewBtn} ${view === 'reviews' ? styles.viewBtnActive : ''}`}
+                                    onClick={() => setView('reviews')}
+                                >
+                                    <FiStar size={18} /> Reviews
+                                    {reviews.length > 0 && <span className={styles.viewBadge}>{reviews.length}</span>}
                                 </button>
                             </div>
 
@@ -230,6 +247,8 @@ export default function DashboardPage() {
                         ) : (
                             view === 'orders' ? (
                                 <AdminOrderTable orders={filtered} onStatusChange={handleStatusChange} />
+                            ) : view === 'reviews' ? (
+                                <AdminReviewTable reviews={reviews} />
                             ) : (
                                 <AdminContactTable contacts={contacts} />
                             )

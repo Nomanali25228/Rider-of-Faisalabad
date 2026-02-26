@@ -30,10 +30,28 @@ export default function FeedbackPage() {
     const [form, setForm] = useState({ name: '', email: '', rating: 0, text: '' });
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const validate = () => {
+        const newErrors = {};
+        if (!form.rating) newErrors.rating = '⭐ Please select a star rating.';
+        if (!form.name.trim()) newErrors.name = '👤 Please enter your name.';
+        if (!form.text.trim()) newErrors.text = '✏️ Please write your review.';
+        return newErrors;
+    };
+
+    const handleChange = (field, value) => {
+        setForm(p => ({ ...p, [field]: value }));
+        if (errors[field]) setErrors(p => ({ ...p, [field]: '' }));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.name || !form.rating || !form.text) return;
+        const newErrors = validate();
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
 
         setSubmitting(true);
         try {
@@ -46,6 +64,7 @@ export default function FeedbackPage() {
             if (data.success) {
                 setSubmitted(true);
                 setForm({ name: '', email: '', rating: 0, text: '' });
+                setErrors({});
             }
         } catch (e) {
             console.error(e);
@@ -117,11 +136,14 @@ export default function FeedbackPage() {
                                             {/* Rating */}
                                             <div className={styles.ratingGroup}>
                                                 <label className="form-label">Your Rating *</label>
-                                                <StarRating value={form.rating} onChange={r => setForm(p => ({ ...p, rating: r }))} />
+                                                <StarRating value={form.rating} onChange={r => handleChange('rating', r)} />
                                                 {form.rating > 0 && (
                                                     <span className={styles.ratingLabel}>
                                                         {['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent!'][form.rating]}
                                                     </span>
+                                                )}
+                                                {errors.rating && (
+                                                    <span className={styles.errorMsg}>{errors.rating}</span>
                                                 )}
                                             </div>
 
@@ -131,13 +153,15 @@ export default function FeedbackPage() {
                                                     <label className="form-label" htmlFor="reviewer-name">Your Name *</label>
                                                     <input
                                                         id="reviewer-name"
-                                                        className="form-input"
+                                                        className={`form-input ${errors.name ? styles.inputError : ''}`}
                                                         type="text"
                                                         placeholder="e.g. Ahmed Raza"
                                                         value={form.name}
-                                                        onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                                                        required
+                                                        onChange={e => handleChange('name', e.target.value)}
                                                     />
+                                                    {errors.name && (
+                                                        <span className={styles.errorMsg}>{errors.name}</span>
+                                                    )}
                                                 </div>
                                                 <div className="form-group">
                                                     <label className="form-label" htmlFor="reviewer-email">Email (Optional)</label>
@@ -147,7 +171,7 @@ export default function FeedbackPage() {
                                                         type="email"
                                                         placeholder="your@email.com"
                                                         value={form.email}
-                                                        onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                                                        onChange={e => handleChange('email', e.target.value)}
                                                     />
                                                 </div>
                                             </div>
@@ -157,20 +181,22 @@ export default function FeedbackPage() {
                                                 <label className="form-label" htmlFor="review-text">Your Review *</label>
                                                 <textarea
                                                     id="review-text"
-                                                    className="form-input"
+                                                    className={`form-input ${errors.text ? styles.inputError : ''}`}
                                                     rows={5}
                                                     placeholder="Tell us about your delivery experience..."
                                                     value={form.text}
-                                                    onChange={e => setForm(p => ({ ...p, text: e.target.value }))}
-                                                    required
+                                                    onChange={e => handleChange('text', e.target.value)}
                                                 />
+                                                {errors.text && (
+                                                    <span className={styles.errorMsg}>{errors.text}</span>
+                                                )}
                                             </div>
 
                                             <button
                                                 type="submit"
                                                 className="btn btn-primary btn-lg"
                                                 style={{ width: '100%', justifyContent: 'center' }}
-                                                disabled={submitting || !form.rating}
+                                                disabled={submitting}
                                                 id="submit-review-btn"
                                             >
                                                 {submitting ? 'Submitting...' : <><FiSend size={16} /> Submit Review</>}
