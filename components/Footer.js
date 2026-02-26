@@ -93,10 +93,10 @@ export default function Footer({ isAdmin }) {
                                 >
                                     <FiInstagram size={18} />
                                 </a>
-                                <a href="tel:+923000000000" className={styles.socialBtn} aria-label="Call us">
+                                <a href="tel:+923027201810" className={styles.socialBtn} aria-label="Call us">
                                     <FiPhone size={18} />
                                 </a>
-                                <a href="mailto:info@riderofaisalabad.com" className={styles.socialBtn} aria-label="Email us">
+                                <a href="mailto:rideroffaisalabad@gmail.com" className={styles.socialBtn} aria-label="Email us">
                                     <FiMail size={18} />
                                 </a>
                             </div>
@@ -142,11 +142,11 @@ export default function Footer({ isAdmin }) {
                                 </li>
                                 <li>
                                     <FiPhone size={16} className={styles.contactIcon} />
-                                    <a href="tel:+923000000000">+92 300 0000000</a>
+                                    <a href="tel:+923027201810">+92 302 7201810</a>
                                 </li>
                                 <li>
                                     <FiMail size={16} className={styles.contactIcon} />
-                                    <a href="mailto:info@riderofaisalabad.com">info@riderofaisalabad.com</a>
+                                    <a href="mailto:rideroffaisalabad@gmail.com">rideroffaisalabad@gmail.com</a>
                                 </li>
                                 <li>
                                     <FiInstagram size={16} className={styles.contactIcon} />

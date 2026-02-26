@@ -7,8 +7,8 @@ import MapLocation from '../components/MapLocation';
 import styles from './contact.module.css';
 
 const contactInfo = [
-    { icon: <FiPhone size={22} />, label: 'Phone', value: '+92 300 0000000', href: 'tel:+923000000000' },
-    { icon: <FiMail size={22} />, label: 'Email', value: 'info@riderofaisalabad.com', href: 'mailto:info@riderofaisalabad.com' },
+    { icon: <FiPhone size={22} />, label: 'Phone', value: '+92 302 7201810', href: 'tel:+923027201810' },
+    { icon: <FiMail size={22} />, label: 'Email', value: 'rideroffaisalabad@gmail.com', href: 'mailto:rideroffaisalabad@gmail.com' },
     { icon: <FiInstagram size={22} />, label: 'Instagram', value: '@rider_of_faisalabad', href: 'https://www.instagram.com/rider_of_faisalabad' },
     { icon: <FiMapPin size={22} />, label: 'Location', value: 'Faisalabad, Punjab, Pakistan', href: null },
 ];

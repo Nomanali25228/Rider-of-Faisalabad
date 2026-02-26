@@ -3,10 +3,12 @@ import { Toaster } from 'react-hot-toast';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import WhatsAppButton from '../components/WhatsAppButton';
+import ScrollToTop from '../components/ScrollToTop';
 import Head from 'next/head';
 
 export default function App({ Component, pageProps, router }) {
-    const isAdmin = router.pathname === '/dashboard';
+    const isAdmin = router.pathname.startsWith('/dashboard') || router.pathname === '/login';
 
     return (
         <>
@@ -46,7 +48,13 @@ export default function App({ Component, pageProps, router }) {
                     <Component {...pageProps} />
                 </motion.div>
             </AnimatePresence>
-            {!isAdmin && <Footer />}
+            {!isAdmin && (
+                <>
+                    <Footer />
+                    <WhatsAppButton />
+                    <ScrollToTop />
+                </>
+            )}
         </>
     );
 }

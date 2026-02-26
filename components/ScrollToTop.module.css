@@ -1,0 +1,40 @@
+.scrollBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 25px;
+    width: 50px;
+    height: 50px;
+    background-color: #2F8F83;
+    /* Main brand teal */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.scrollBtn:hover {
+    background-color: #F4C542;
+    /* Hover gold color */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .scrollBtn {
+        bottom: 25px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+    }
+
+    .scrollBtn svg {
+        width: 20px;
+        height: 20px;
+    }
+}
