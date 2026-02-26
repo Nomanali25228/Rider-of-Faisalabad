@@ -155,86 +155,56 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 480px;
+    height: auto;
+    min-height: 500px;
 }
 
-.routeSvg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    animation: spin-slow 40s linear infinite;
-}
-
-@keyframes spin-slow {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Rider Circle */
-.riderCircle {
+/* Hero Image */
+.heroImageWrapper {
     position: relative;
     z-index: 2;
-}
-
-.riderPulse {
-    position: absolute;
-    inset: -20px;
-    border-radius: 50%;
-    border: 2px solid rgba(168, 213, 207, 0.3);
-    animation: pulse 2.5s ease-in-out infinite;
-}
-
-.riderPulse2 {
-    position: absolute;
-    inset: -40px;
-    border-radius: 50%;
-    border: 1px solid rgba(168, 213, 207, 0.15);
-    animation: pulse 2.5s ease-in-out infinite 1.2s;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.08);
-        opacity: 0.5;
-    }
-}
-
-.riderInner {
-    width: 160px;
-    height: 160px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(16px);
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: float 4s ease-in-out infinite;
-    box-shadow: 0 0 60px rgba(47, 143, 131, 0.4), 0 0 120px rgba(47, 143, 131, 0.2);
+    width: 100%;
 }
 
-@keyframes float {
+.heroImageGlow {
+    position: absolute;
+    inset: -40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(47, 143, 131, 0.35) 0%, rgba(47, 143, 131, 0.1) 40%, transparent 70%);
+    filter: blur(25px);
+    z-index: -1;
+}
 
-    0%,
-    100% {
-        transform: translateY(0);
-    }
+.heroImage {
+    width: 100%;
+    max-width: 580px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+    border-radius: 16px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
 
-    50% {
-        transform: translateY(-14px);
-    }
+.imageProtect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    background: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* Stat Cards */
@@ -349,12 +319,12 @@
     .hero {
         min-height: auto;
         padding-top: 100px;
-        padding-bottom: 60px;
+        padding-bottom: 30px;
     }
 
     .inner {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 20px;
         padding-top: 0;
         padding-bottom: 0;
         min-height: auto;
@@ -372,16 +342,20 @@
         margin: 0 auto;
     }
 
-    .visual {
-        height: 380px;
-        width: 100%;
-        max-width: 500px;
-        margin: 40px auto 0;
+    .scrollIndicator {
+        display: none;
     }
 
-    .riderInner {
-        width: 140px;
-        height: 140px;
+    .visual {
+        height: auto;
+        min-height: auto;
+        width: 100%;
+        max-width: 550px;
+        margin: 0 auto;
+    }
+
+    .heroImage {
+        max-width: 100%;
     }
 
     .statCard0 {
@@ -406,12 +380,34 @@
     }
 
     .visual {
-        height: 320px;
+        height: auto;
+        min-height: auto;
+        margin: 0 auto;
+    }
+
+    .heroImage {
+        max-width: 100%;
     }
 
     .statCard {
-        scale: 0.9;
-        padding: 10px 14px;
+        display: none;
+    }
+
+    .features {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .featurePill {
+        font-size: 11px;
+        padding: 5px 10px;
+        gap: 4px;
+    }
+
+    .featurePill svg {
+        width: 14px;
+        height: 14px;
     }
 }
 
@@ -432,16 +428,22 @@
 
 @media (max-width: 480px) {
     .hero {
-        padding-top: 90px;
+        padding-top: 80px;
+        padding-bottom: 20px;
+    }
+
+    .inner {
+        gap: 16px;
     }
 
     .visual {
-        height: 280px;
+        height: auto;
+        min-height: auto;
+        margin: 0 auto;
     }
 
-    .riderInner {
-        width: 100px;
-        height: 100px;
+    .heroImage {
+        max-width: 100%;
     }
 
     .headline {
@@ -450,22 +452,18 @@
     }
 
     .statCard {
-        scale: 0.8;
-        padding: 8px 12px;
+        display: none;
     }
 
-    .statCard0 {
-        top: 15%;
-        left: -5px;
+    .features {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
     }
 
-    .statCard1 {
-        top: 5%;
-        right: -5px;
-    }
-
-    .statCard2 {
-        bottom: 5%;
-        left: -5px;
+    .featurePill {
+        font-size: 10px;
+        padding: 4px 8px;
+        gap: 3px;
     }
 }

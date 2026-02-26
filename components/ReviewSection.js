@@ -4,12 +4,11 @@ import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import styles from './ReviewSection.module.css';
 
 const staticReviews = [
-    { id: 1, name: 'Ahmed Raza', location: 'Faisalabad', rating: 5, text: 'Excellent service! Waqas delivered my parcel in less than 2 hours. Very professional and trustworthy.', date: '2024-01-15' },
-    { id: 2, name: 'Fatima Khan', location: 'Lahore', rating: 5, text: 'Best rider service in Punjab! Sent a gift to my sister in Faisalabad. Arrived fresh and on time. Highly recommended!', date: '2024-01-20' },
-    { id: 3, name: 'Muhammad Bilal', location: 'Faisalabad', rating: 5, text: 'Used them for urgent document delivery. They arrived within the promised window. Very reliable!', date: '2024-01-25' },
-    { id: 4, name: 'Sana Malik', location: 'Rawalpindi', rating: 4, text: 'Great service for inter-city deliveries. Safe and secure handling of my electronics.', date: '2024-02-01' },
-    { id: 5, name: 'Ali Hassan', location: 'Karachi', rating: 5, text: 'Called for a birthday gift delivery. They wrapped it beautifully and delivered with a personal touch. Amazing!', date: '2024-02-08' },
-];
+    { id: 1, name: 'Ahmed Raza', location: 'Faisalabad', rating: 5, text: 'Zabardast service! Waqas bhai ne mera parcel 2 ghanton se kam time mein deliver kar diya. Bohat professional aur bharosemand.', date: '2024-01-15' },
+    { id: 2, name: 'Fatima Khan', location: 'Lahore', rating: 5, text: 'Punjab ka best rider hai Maine apni behan ko Faisalabad mein gift bheja tha. Bilkul fresh aur time par deliver hua. Highly recommended!', date: '2024-01-20' },
+    { id: 3, name: 'Muhammad Bilal', location: 'Faisalabad', rating: 5, text: 'Urgent documents delivery ke liye use kiya. Jo time promise kiya tha usi window mein aa gaye. Bohat reliable service!', date: '2024-01-25' },
+    { id: 4, name: 'Sana Malik', location: 'Rawalpindi', rating: 4, text: 'Inter-city deliveries ke liye great service. Mere electronics ko safe aur secure tareeke se handle kiya.', date: '2024-02-01' },
+    { id: 5, name: 'Ali Hassan', location: 'Karachi', rating: 5, text: 'Birthday gift delivery ke liye call kiya tha. Unhon ne gift khoobsurati se wrap kiya aur personal touch ke saath deliver kiya. Amazing service!', date: '2024-02-08' },];
 
 function StarRating({ value, onChange, readOnly = false }) {
     const [hover, setHover] = useState(0);

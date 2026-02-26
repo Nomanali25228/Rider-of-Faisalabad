@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle } from 'react-icons/fi';
@@ -25,6 +25,24 @@ const REJECTION_SUGGESTIONS = [
 export default function AdminOrderTable({ orders = [], onStatusChange }) {
     const [selected, setSelected] = useState(null);
     const [updating, setUpdating] = useState(null);
+    const detailRef = useRef(null);
+
+    // Auto-scroll to details when opened
+    useEffect(() => {
+        if (selected && detailRef.current) {
+            setTimeout(() => {
+                detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+    }, [selected]);
+
+    const handleSelectOrder = (order) => {
+        if (selected?.trackingId === order.trackingId) {
+            setSelected(null);
+        } else {
+            setSelected(order);
+        }
+    };
 
     // Rejection Modal State
     const [showRejectModal, setShowRejectModal] = useState(false);
@@ -136,7 +154,7 @@ export default function AdminOrderTable({ orders = [], onStatusChange }) {
                                         <div className={styles.actionBtns}>
                                             <button
                                                 className={styles.iconBtn}
-                                                onClick={() => setSelected(selected?.trackingId === order.trackingId ? null : order)}
+                                                onClick={() => handleSelectOrder(order)}
                                                 title="View Details"
                                                 aria-label="View order details"
                                             >
@@ -146,15 +164,13 @@ export default function AdminOrderTable({ orders = [], onStatusChange }) {
                                             {order.status !== 'Rejected' && (
                                                 <>
                                                     {order.voiceNoteUrl && (
-                                                        <a
-                                                            href={order.voiceNoteUrl}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
+                                                        <button
+                                                            onClick={() => handleSelectOrder(order)}
                                                             className={`${styles.iconBtn} ${styles.voiceBtn}`}
                                                             title="Listen to Voice Note"
                                                         >
                                                             <FiMic size={15} />
-                                                        </a>
+                                                        </button>
                                                     )}
                                                     {order.status === 'Pending' && (
                                                         <>
@@ -192,10 +208,12 @@ export default function AdminOrderTable({ orders = [], onStatusChange }) {
             {/* Detail Panel */}
             {selected && (
                 <motion.div
+                    ref={detailRef}
                     className={styles.detailPanel}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
+                    style={{ scrollMarginTop: '100px' }}
                 >
                     <div className={styles.detailHeader}>
                         <h3>Order Details — {selected.trackingId}</h3>
@@ -230,8 +248,18 @@ export default function AdminOrderTable({ orders = [], onStatusChange }) {
                         </div>
                         {selected.message && (
                             <div className={`${styles.detailItem} ${styles.detailFull}`}>
-                                <span className={styles.detailLabel}>Instructions</span>
+                                <span className={styles.detailLabel}>Text Instructions</span>
                                 <span>{selected.message}</span>
+                            </div>
+                        )}
+                        {selected.voiceNoteUrl && (
+                            <div className={`${styles.detailItem} ${styles.detailFull}`}>
+                                <span className={styles.detailLabel}><FiMic size={12} /> Voice Recording</span>
+                                <div style={{ marginTop: '10px', background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #eef2f6' }}>
+                                    <audio controls src={selected.voiceNoteUrl} style={{ width: '100%', height: '36px' }}>
+                                        Your browser does not support audio.
+                                    </audio>
+                                </div>
                             </div>
                         )}
                         {selected.status === 'Rejected' && selected.rejectionReason && (

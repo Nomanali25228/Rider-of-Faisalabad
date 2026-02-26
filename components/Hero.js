@@ -1,11 +1,12 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FiPackage, FiSearch, FiShield, FiClock, FiStar, FiMapPin } from 'react-icons/fi';
 import { MdDeliveryDining } from 'react-icons/md';
 import styles from './Hero.module.css';
 
 const floatingStats = [
-    { icon: <FiPackage size={18} />, value: '5K+', label: 'Deliveries Done', color: '#2F8F83' },
+    { icon: <FiPackage size={18} />, value: '2.5K+', label: 'Deliveries Done', color: '#2F8F83' },
     { icon: <FiStar size={18} />, value: '4.9★', label: 'Customer Rating', color: '#F4C542' },
     { icon: <FiClock size={18} />, value: '2 Hrs', label: 'Avg Delivery', color: '#2F8F83' },
 ];
@@ -87,9 +88,9 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7, duration: 0.6 }}
                     >
-                        <Link href="/contact" className="btn btn-primary btn-lg" id="hero-book-btn">
+                        <Link href="/#quick-order" className="btn btn-primary btn-lg" id="hero-book-btn">
                             <FiPackage size={20} />
-                            Book a Delivery
+                            Order Now
                         </Link>
                         <Link href="/track-order" className={`btn btn-lg ${styles.trackBtn}`} id="hero-track-btn">
                             <FiSearch size={20} />
@@ -105,13 +106,22 @@ export default function Hero() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    {/* Central Rider Icon */}
-                    <div className={styles.riderCircle}>
-                        <div className={styles.riderPulse} />
-                        <div className={styles.riderPulse2} />
-                        <div className={styles.riderInner}>
-                            <MdDeliveryDining size={72} color="white" />
-                        </div>
+                    {/* Hero Image */}
+                    <div className={styles.heroImageWrapper}>
+                        <div className={styles.heroImageGlow} />
+                        <Image
+                            src="/images/hero-gifts-removebg-preview.png"
+                            alt="Bouquets, Cakes & Gifts - Rider of Faisalabad Delivery"
+                            width={520}
+                            height={520}
+                            priority
+                            className={styles.heroImage}
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
+                            draggable={false}
+                        />
+                        {/* Transparent overlay to block copy/save */}
+                        <div className={styles.imageProtect} />
                     </div>
 
                     {/* Floating Stats */}
@@ -136,12 +146,6 @@ export default function Hero() {
                             </div>
                         </motion.div>
                     ))}
-
-                    {/* Route Lines */}
-                    <svg className={styles.routeSvg} viewBox="0 0 300 300" fill="none">
-                        <circle cx="150" cy="150" r="120" stroke="rgba(168,213,207,0.2)" strokeWidth="1.5" strokeDasharray="6 4" />
-                        <circle cx="150" cy="150" r="80" stroke="rgba(168,213,207,0.15)" strokeWidth="1" strokeDasharray="4 6" />
-                    </svg>
                 </motion.div>
             </div>
 

@@ -364,26 +364,24 @@
     .orderGrid {
         grid-template-columns: 1fr;
         gap: 32px;
-        text-align: center;
+        text-align: left;
     }
 
     .orderFeatures {
-        align-items: center;
+        align-items: flex-start;
     }
 
     .orderNotice {
         max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
         padding: 16px;
         flex-direction: column;
-        align-items: center;
-        text-align: center;
+        align-items: flex-start;
+        text-align: left;
     }
 
     .urduText {
         font-size: 17px;
-        text-align: center;
+        text-align: left;
     }
 
     .statValue {

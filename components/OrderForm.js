@@ -28,6 +28,14 @@ export default function OrderForm({ compact = false }) {
     const [loading, setLoading] = useState(false);
     const [trackingId, setTrackingId] = useState(null);
     const [mapMode, setMapMode] = useState(null); // 'pickup' or 'drop'
+    const successRef = useRef(null);
+
+    // Auto-scroll to success message
+    useEffect(() => {
+        if (trackingId && successRef.current) {
+            successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [trackingId]);
 
     // Voice Recorder State
     const [isRecording, setIsRecording] = useState(false);
@@ -145,6 +153,7 @@ export default function OrderForm({ compact = false }) {
     if (trackingId) {
         return (
             <motion.div
+                ref={successRef}
                 className={styles.successCard}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}

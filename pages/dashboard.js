@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiPackage, FiCheckCircle, FiClock, FiTruck, FiXCircle, FiRefreshCw, FiLogOut } from 'react-icons/fi';
+import { FiPackage, FiCheckCircle, FiClock, FiTruck, FiXCircle, FiRefreshCw, FiLogOut, FiMail } from 'react-icons/fi';
 import AdminOrderTable from '../components/AdminOrderTable';
+import AdminContactTable from '../components/AdminContactTable';
 import styles from './dashboard.module.css';
 
 const statCards = [
@@ -17,28 +18,38 @@ const statCards = [
 
 export default function DashboardPage() {
     const [orders, setOrders] = useState([]);
+    const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
+    const [view, setView] = useState('orders'); // 'orders' or 'contacts'
     const [isAuth, setIsAuth] = useState(false);
     const router = useRouter();
 
-    const fetchOrders = async () => {
+    const fetchDashboardData = async () => {
         const token = localStorage.getItem('admin_token');
         if (!token) return;
 
         setLoading(true);
         try {
-            const res = await fetch('/api/orders/list', {
+            // Fetch Orders
+            const ordersRes = await fetch('/api/orders/list', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            const data = await res.json();
-            if (data.success) {
-                setOrders(data.orders);
-            } else {
-                toast.error(data.message || 'Failed to fetch orders.');
+            const ordersData = await ordersRes.json();
+            if (ordersData.success) {
+                setOrders(ordersData.orders);
+            }
+
+            // Fetch Contacts
+            const contactsRes = await fetch('/api/contact/list', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const contactsData = await contactsRes.json();
+            if (contactsData.success) {
+                setContacts(contactsData.contacts);
             }
         } catch (err) {
-            toast.error('Network error while fetching orders.');
+            toast.error('Network error while fetching data.');
         } finally {
             setLoading(false);
         }
@@ -50,7 +61,7 @@ export default function DashboardPage() {
             router.replace('/login');
         } else {
             setIsAuth(true);
-            fetchOrders();
+            fetchDashboardData();
         }
     }, [router]);
 
@@ -58,8 +69,13 @@ export default function DashboardPage() {
         total: orders.length,
         pending: orders.filter(o => o.status === 'Pending').length,
         inProgress: orders.filter(o => o.status === 'In Progress').length,
-        delivered: orders.filter(o => o.status === 'Delivered').length,
+        contacts: contacts.length,
     };
+
+    const displayStatCards = [
+        ...statCards.slice(0, 3),
+        { key: 'contacts', label: 'Inquiries', icon: <FiMail size={22} />, color: '#7c3aed' }
+    ];
 
     const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
@@ -122,9 +138,9 @@ export default function DashboardPage() {
                     <div className={styles.dbHeaderRight}>
                         <button
                             className={styles.refreshBtn}
-                            onClick={fetchOrders}
+                            onClick={fetchDashboardData}
                             disabled={loading}
-                            aria-label="Refresh orders"
+                            aria-label="Refresh data"
                         >
                             <FiRefreshCw size={16} className={loading ? styles.spinning : ''} />
                             Refresh
@@ -139,15 +155,16 @@ export default function DashboardPage() {
                 <main className={styles.dbMain}>
                     {/* Stats */}
                     <div className={styles.statsGrid}>
-                        {statCards.map(({ key, label, icon, color }, i) => (
+                        {displayStatCards.map(({ key, label, icon, color }, i) => (
                             <motion.div
                                 key={key}
                                 className={styles.statCard}
-                                style={{ '--stat-color': color }}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.1, duration: 0.5 }}
                                 whileHover={{ y: -4 }}
+                                onClick={() => key === 'contacts' ? setView('contacts') : setView('orders')}
+                                style={{ '--stat-color': color }}
                             >
                                 <div className={styles.statIcon}>{icon}</div>
                                 <div className={styles.statInfo}>
@@ -159,43 +176,63 @@ export default function DashboardPage() {
                         ))}
                     </div>
 
-                    {/* Orders Section */}
+                    {/* Main Content Sections */}
                     <div className={styles.ordersSection}>
                         <div className={styles.ordersSectionHeader}>
-                            <h2 className={styles.sectionTitle}>All Orders</h2>
-                            {/* Filter Tabs */}
-                            <div className={styles.filterTabs}>
-                                {[
-                                    { key: 'all', label: 'All' },
-                                    { key: 'Pending', label: 'Pending' },
-                                    { key: 'Accepted', label: 'Accepted' },
-                                    { key: 'In Progress', label: 'In Progress' },
-                                    { key: 'Delivered', label: 'Delivered' },
-                                    { key: 'Rejected', label: 'Rejected' },
-                                ].map(({ key, label }) => (
-                                    <button
-                                        key={key}
-                                        className={`${styles.filterTab} ${filter === key ? styles.filterTabActive : ''}`}
-                                        onClick={() => setFilter(key)}
-                                    >
-                                        {label}
-                                        {key !== 'all' && (
-                                            <span className={styles.tabCount}>
-                                                {orders.filter(o => o.status === key).length}
-                                            </span>
-                                        )}
-                                    </button>
-                                ))}
+                            <div className={styles.viewToggle}>
+                                <button
+                                    className={`${styles.viewBtn} ${view === 'orders' ? styles.viewBtnActive : ''}`}
+                                    onClick={() => setView('orders')}
+                                >
+                                    <FiPackage size={18} /> Orders
+                                </button>
+                                <button
+                                    className={`${styles.viewBtn} ${view === 'contacts' ? styles.viewBtnActive : ''}`}
+                                    onClick={() => setView('contacts')}
+                                >
+                                    <FiMail size={18} /> Inquiries
+                                    {contacts.length > 0 && <span className={styles.viewBadge}>{contacts.length}</span>}
+                                </button>
                             </div>
+
+                            {view === 'orders' && (
+                                <div className={styles.filterTabs}>
+                                    {[
+                                        { key: 'all', label: 'All' },
+                                        { key: 'Pending', label: 'Pending' },
+                                        { key: 'Accepted', label: 'Accepted' },
+                                        { key: 'In Progress', label: 'In Progress' },
+                                        { key: 'Delivered', label: 'Delivered' },
+                                        { key: 'Rejected', label: 'Rejected' },
+                                    ].map(({ key, label }) => (
+                                        <button
+                                            key={key}
+                                            className={`${styles.filterTab} ${filter === key ? styles.filterTabActive : ''}`}
+                                            onClick={() => setFilter(key)}
+                                        >
+                                            {label}
+                                            {key !== 'all' && (
+                                                <span className={styles.tabCount}>
+                                                    {orders.filter(o => o.status === key).length}
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
-                        {loading && orders.length === 0 ? (
+                        {loading && (orders.length === 0 && contacts.length === 0) ? (
                             <div style={{ textAlign: 'center', padding: '100px 0', opacity: 0.5 }}>
                                 <FiRefreshCw size={40} className={styles.spinning} style={{ marginBottom: 16 }} />
-                                <p>Loading orders...</p>
+                                <p>Loading data...</p>
                             </div>
                         ) : (
-                            <AdminOrderTable orders={filtered} onStatusChange={handleStatusChange} />
+                            view === 'orders' ? (
+                                <AdminOrderTable orders={filtered} onStatusChange={handleStatusChange} />
+                            ) : (
+                                <AdminContactTable contacts={contacts} />
+                            )
                         )}
                     </div>
                 </main>

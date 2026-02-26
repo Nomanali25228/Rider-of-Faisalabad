@@ -24,7 +24,14 @@ export default function ContactPage() {
     const mediaRecorderRef = useRef(null);
     const chunksRef = useRef([]);
     const timerRef = useRef(null);
-    const voiceRef = useRef();
+    const successRef = useRef(null);
+
+    // Auto-scroll to success
+    useEffect(() => {
+        if (submitted && successRef.current) {
+            successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [submitted]);
 
     useEffect(() => {
         return () => {
@@ -202,7 +209,7 @@ export default function ContactPage() {
                                 className={styles.formCard}
                             >
                                 {submitted ? (
-                                    <div className={styles.successMsg}>
+                                    <div className={styles.successMsg} ref={successRef}>
                                         <div className={styles.successEmoji}>✅</div>
                                         <h3>Message Sent!</h3>
                                         <p>We&apos;ll respond within <strong>6 hours</strong>. Thank you for contacting Rider of Faisalabad!</p>
