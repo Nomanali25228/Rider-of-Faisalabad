@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FiInstagram, FiPhone, FiMail, FiMapPin, FiArrowRight } from 'react-icons/fi';
+import { FaFacebook, FaTiktok } from 'react-icons/fa';
 import styles from './Footer.module.css';
 
 const quickLinks = [
@@ -92,6 +93,24 @@ export default function Footer({ isAdmin }) {
                                     id="footer-instagram-link"
                                 >
                                     <FiInstagram size={18} />
+                                </a>
+                                <a
+                                    href="https://www.facebook.com/profile.php?id=61566378457008"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.socialBtn}
+                                    aria-label="Follow us on Facebook"
+                                >
+                                    <FaFacebook size={18} />
+                                </a>
+                                <a
+                                    href="https://www.tiktok.com/@raideroffaisalabad"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.socialBtn}
+                                    aria-label="Follow us on TikTok"
+                                >
+                                    <FaTiktok size={18} />
                                 </a>
                                 <a href="tel:+923027201810" className={styles.socialBtn} aria-label="Call us">
                                     <FiPhone size={18} />

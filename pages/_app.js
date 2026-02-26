@@ -8,7 +8,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import Head from 'next/head';
 
 export default function App({ Component, pageProps, router }) {
-    const isAdmin = router.pathname.startsWith('/dashboard') || router.pathname === '/login';
+    const isAdmin = router.pathname.startsWith('/dashboard');
 
     return (
         <>
