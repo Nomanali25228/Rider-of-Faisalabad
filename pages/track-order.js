@@ -219,6 +219,7 @@ export default function TrackOrderPage() {
                                                     <div key={step} className={styles.progressStep}>
                                                         <div
                                                             className={`${styles.stepCircle} ${i <= cfg.step ? styles.stepDone : ''} ${i === cfg.step ? styles.stepActive : ''}`}
+                                                            data-label={step}
                                                         >
                                                             {i < cfg.step ? <FiCheckCircle size={14} /> : i + 1}
                                                         </div>

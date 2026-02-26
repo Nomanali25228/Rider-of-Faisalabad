@@ -1,0 +1,291 @@
+.hero {
+    position: relative;
+    background: linear-gradient(135deg, #0d3530 0%, #2F8F83 100%);
+    padding: 100px 0 130px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.heroText {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.heroSub {
+    font-size: 17px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 16px;
+    line-height: 1.7;
+}
+
+.heroShape {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: var(--bg);
+    clip-path: ellipse(60% 100% at 50% 100%);
+    z-index: 1;
+}
+
+/* Grid */
+.contentGrid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* Form Card */
+.formCard {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(47, 143, 131, 0.1);
+    border: 1px solid rgba(47, 143, 131, 0.08);
+}
+
+.formTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #222;
+    margin-bottom: 6px;
+}
+
+.formSub {
+    color: #888;
+    font-size: 15px;
+    margin-bottom: 32px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.halfGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Star Rating */
+.ratingGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.stars {
+    display: flex;
+    gap: 6px;
+}
+
+.star {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.star svg {
+    fill: #ddd;
+    color: #ddd;
+    transition: all 0.15s ease;
+}
+
+.starActive svg {
+    fill: #F4C542;
+    color: #F4C542;
+    transform: scale(1.1);
+}
+
+.ratingLabel {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2F8F83;
+}
+
+/* Thank You State */
+.thankYou {
+    text-align: center;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.thankIcon {
+    font-size: 56px;
+    animation: bounce 1s ease;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+.thankYou h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #222;
+    margin: 0;
+}
+
+.thankYou p {
+    color: #666;
+    font-size: 15px;
+    max-width: 360px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Side Info */
+.sideInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: sticky;
+    top: 90px;
+}
+
+.infoCard {
+    background: white;
+    padding: 28px;
+    border-radius: 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+
+.infoIcon {
+    color: #F4C542;
+    margin-bottom: 16px;
+}
+
+.infoCard h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.infoCard p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.benefitList {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.benefitList li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+}
+
+.benefitList li::before {
+    content: "✓";
+    color: white;
+    background: #2F8F83;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.ctaCard {
+    background: linear-gradient(135deg, #0d3530, #2F8F83);
+    padding: 28px;
+    border-radius: 20px;
+    color: white;
+}
+
+.ctaCard h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.ctaCard p {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .sideInfo {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .infoCard,
+    .ctaCard {
+        flex: 1;
+        min-width: 260px;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero {
+        padding: 80px 0 110px;
+    }
+
+    .heroSub {
+        font-size: 15px;
+    }
+
+    .formCard {
+        padding: 24px 18px;
+    }
+
+    .formTitle {
+        font-size: 22px;
+    }
+
+    .halfGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .sideInfo {
+        flex-direction: column;
+    }
+}

@@ -11,6 +11,7 @@ const quickLinks = [
     { href: '/services', label: 'Services' },
     { href: '/gallery', label: 'Gallery' },
     { href: '/contact', label: 'Contact' },
+    { href: '/feedback', label: 'Feedback' },
     { href: '/track-order', label: 'Track Order' },
 ];
 
