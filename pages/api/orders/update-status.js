@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const currentOrder = getOrderById(orderId);
+        const currentOrder = await getOrderById(orderId);
         if (!currentOrder) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
@@ -28,34 +28,32 @@ export default async function handler(req, res) {
             return res.status(200).json({ success: true, message: 'Status is already set to ' + status });
         }
 
-        // Prevent updating if already Rejected
-        // Prevent updating if already in a final state
+        // Prevent updating if already Rejected or Delivered
         if (currentOrder.status === 'Rejected' || currentOrder.status === 'Delivered') {
             return res.status(400).json({ success: false, message: `This order is already ${currentOrder.status.toLowerCase()} and cannot be changed.` });
         }
 
         const extraData = status === 'Rejected' ? { rejectionReason } : {};
-        const success = updateOrderStatus(orderId, status, extraData);
+        const success = await updateOrderStatus(orderId, status, extraData);
         if (!success) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
+            return res.status(404).json({ success: false, message: 'Order update failed' });
         }
 
-        const order = getOrderById(orderId);
+        const updatedOrder = await getOrderById(orderId);
 
-        // Send status update emails (Wrapped in try-catch so SMTP errors don't break status updates)
+        // Send status update emails
         try {
-            if (process.env.SMTP_HOST && order && order.email) {
+            if (process.env.SMTP_HOST && updatedOrder && updatedOrder.email) {
                 if (status === 'Accepted') {
-                    await sendAcceptedEmail(order);
+                    await sendAcceptedEmail(updatedOrder);
                 } else if (status === 'Rejected') {
-                    await sendRejectedEmail(order, rejectionReason);
+                    await sendRejectedEmail(updatedOrder, rejectionReason);
                 } else if (status === 'Delivered') {
-                    await sendDeliveredEmail(order);
+                    await sendDeliveredEmail(updatedOrder);
                 }
             }
         } catch (emailErr) {
             console.error('Email notification failed for status:', status, emailErr);
-            // We don't return error here because the status WAS updated in the system successfully
         }
 
         return res.status(200).json({ success: true, message: `Status updated to ${status}` });
@@ -69,7 +67,7 @@ async function getTransporter() {
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+        secure: process.env.SMTP_PORT == 465,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS
@@ -77,7 +75,7 @@ async function getTransporter() {
         tls: {
             rejectUnauthorized: false
         },
-        pool: true // Use pooled connections for better performance on status updates
+        pool: true
     });
 }
 

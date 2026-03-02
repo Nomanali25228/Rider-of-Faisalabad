@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 import { IncomingForm } from 'formidable';
-import path from 'path';
-import fs from 'fs';
 import { addOrder } from '../../../lib/ordersStore';
+import { uploadToCloudinary } from '../../../lib/cloudinary';
+import fs from 'fs';
 
 export const config = {
     api: {
@@ -13,12 +13,9 @@ export const config = {
 
 async function parseForm(req) {
     return new Promise((resolve, reject) => {
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+        const os = require('os');
         const form = new IncomingForm({
-            uploadDir,
+            uploadDir: os.tmpdir(),
             keepExtensions: true,
             maxFileSize: 10 * 1024 * 1024, // 10MB
         });
@@ -38,6 +35,16 @@ export default async function handler(req, res) {
         const { fields, files } = await parseForm(req);
         const trackingId = 'ROF-' + uuidv4().slice(0, 8).toUpperCase();
 
+        let voiceNoteUrl = null;
+        if (files.voiceNote) {
+            const voiceFile = Array.isArray(files.voiceNote) ? files.voiceNote[0] : files.voiceNote;
+            const fileBuffer = fs.readFileSync(voiceFile.filepath);
+            const uploadResult = await uploadToCloudinary(fileBuffer, 'video', 'voice-notes');
+            voiceNoteUrl = uploadResult.url;
+            // Clean up temporary file
+            try { fs.unlinkSync(voiceFile.filepath); } catch (e) { console.error('Error unlinking tmp voice note:', e); }
+        }
+
         const order = {
             _id: uuidv4(),
             trackingId,
@@ -51,13 +58,11 @@ export default async function handler(req, res) {
             message: Array.isArray(fields.message) ? fields.message[0] : (fields.message || ''),
             status: 'Pending',
             createdAt: new Date().toISOString(),
-            voiceNoteUrl: files.voiceNote
-                ? `/uploads/${path.basename(Array.isArray(files.voiceNote) ? files.voiceNote[0].filepath : files.voiceNote.filepath)}`
-                : null,
+            voiceNoteUrl,
         };
 
-        // Add to shared in-memory store
-        addOrder(order);
+        // Add to GitHub store
+        await addOrder(order);
 
         // Send emails
         try {
@@ -145,7 +150,7 @@ async function sendOrderEmails(order) {
                         <p style="font-size:13px; color:#888;">If you have any questions, feel free to reply to this email or contact us via WhatsApp.</p>
                     </div>
                     <div style="background:#f4f4f4; padding:20px; text-align:center; font-size:12px; color:#999;">
-                        &copy; 2021 Rider of Faisalabad. All rights reserved.
+                        &copy; ${new Date().getFullYear()} Rider of Faisalabad. All rights reserved.
                     </div>
                 </div>
             `,

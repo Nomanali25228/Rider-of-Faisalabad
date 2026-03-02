@@ -1,6 +1,6 @@
 import { addReview } from '../../../lib/reviewStore';
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, message: 'Method not allowed' });
     }
@@ -11,13 +11,18 @@ export default function handler(req, res) {
         return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    const review = addReview({
-        name,
-        email: email || null,
-        rating,
-        text,
-        location: location || 'Faisalabad'
-    });
+    try {
+        const review = await addReview({
+            name,
+            email: email || null,
+            rating,
+            text,
+            location: location || 'Faisalabad'
+        });
 
-    return res.status(200).json({ success: true, review });
+        return res.status(200).json({ success: true, review });
+    } catch (err) {
+        console.error('Review create error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to add review.' });
+    }
 }

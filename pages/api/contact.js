@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 import { IncomingForm } from 'formidable';
-import path from 'path';
 import fs from 'fs';
+import { addContact } from '../../lib/contactStore';
+import { uploadToCloudinary } from '../../lib/cloudinary';
 
 export const config = {
     api: {
@@ -11,12 +12,9 @@ export const config = {
 
 async function parseForm(req) {
     return new Promise((resolve, reject) => {
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+        const os = require('os');
         const form = new IncomingForm({
-            uploadDir,
+            uploadDir: os.tmpdir(),
             keepExtensions: true,
             maxFileSize: 10 * 1024 * 1024, // 10MB
         });
@@ -40,14 +38,22 @@ export default async function handler(req, res) {
         const phone = Array.isArray(fields.phone) ? fields.phone[0] : fields.phone;
         const subject = Array.isArray(fields.subject) ? fields.subject[0] : fields.subject;
         const message = Array.isArray(fields.message) ? fields.message[0] : fields.message;
-        const voiceNote = files.voiceNote ? (Array.isArray(files.voiceNote) ? files.voiceNote[0] : files.voiceNote) : null;
 
         if (!name || !message) {
             return res.status(400).json({ success: false, message: 'Name and message are required.' });
         }
 
+        let voiceNoteUrl = null;
+        if (files.voiceNote) {
+            const voiceFile = Array.isArray(files.voiceNote) ? files.voiceNote[0] : files.voiceNote;
+            const fileBuffer = fs.readFileSync(voiceFile.filepath);
+            const uploadResult = await uploadToCloudinary(fileBuffer, 'video', 'contact-voice');
+            voiceNoteUrl = uploadResult.url;
+            try { fs.unlinkSync(voiceFile.filepath); } catch (e) { console.error('Error unlinking tmp voice note:', e); }
+        }
+
+        // 1. Send Emails
         if (process.env.SMTP_HOST) {
-            const nodemailer = (await import('nodemailer')).default;
             const transporter = nodemailer.createTransport({
                 host: process.env.SMTP_HOST,
                 port: Number(process.env.SMTP_PORT) || 587,
@@ -56,9 +62,6 @@ export default async function handler(req, res) {
                 tls: { rejectUnauthorized: false }
             });
 
-            const voiceUrl = voiceNote ? `${process.env.NEXT_PUBLIC_SITE_URL || ''}/uploads/${path.basename(voiceNote.filepath)}` : null;
-
-            // 1. Send Email to Admin
             if (process.env.ADMIN_EMAIL) {
                 await transporter.sendMail({
                     from: `"Rider of Faisalabad - Inquiry" <${process.env.SMTP_USER}>`,
@@ -75,17 +78,16 @@ export default async function handler(req, res) {
                                 <p style="margin-top: 0;"><strong>Message:</strong></p>
                                 <p style="white-space: pre-wrap;">${message}</p>
                             </div>
-                            ${voiceUrl ? `
+                            ${voiceNoteUrl ? `
                             <div style="margin-top: 20px; padding: 15px; background: #e6f4f1; border-radius: 8px;">
                                 <p>🎤 <strong>A voice note was attached:</strong></p>
-                                <a href="${voiceUrl}" style="background: #2F8F83; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">Listen to Voice Note</a>
+                                <a href="${voiceNoteUrl}" style="background: #2F8F83; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">Listen to Voice Note</a>
                             </div>` : ''}
                         </div>
                     `,
                 });
             }
 
-            // 2. Send Confirmation Email to User
             if (email) {
                 await transporter.sendMail({
                     from: `"Rider of Faisalabad" <${process.env.SMTP_USER}>`,
@@ -93,9 +95,7 @@ export default async function handler(req, res) {
                     subject: `Confirmation: We received your message!`,
                     html: `
                         <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-                            <div style="text-align: center;">
-                                <h1 style="color: #2F8F83;">Hello ${name}!</h1>
-                            </div>
+                            <h1 style="color: #2F8F83; text-align: center;">Hello ${name}!</h1>
                             <p>Thank you for contacting <strong>Rider of Faisalabad</strong>. We have received your inquiry regarding "<strong>${subject || 'General Inquiry'}</strong>".</p>
                             <p>Our team is reviewing your message and will get back to you as soon as possible.</p>
                             <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
@@ -105,8 +105,7 @@ export default async function handler(req, res) {
                             <p>If this is an urgent delivery requirement, feel free to call us directly at our helpline.</p>
                             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
                             <p style="text-align: center; color: #888; font-size: 12px;">
-                                © ${new Date().getFullYear()} Rider of Faisalabad. All rights reserved.<br>
-                                Faisalabad, Punjab, Pakistan.
+                                © ${new Date().getFullYear()} Rider of Faisalabad. All rights reserved.
                             </p>
                         </div>
                     `,
@@ -114,11 +113,10 @@ export default async function handler(req, res) {
             }
         }
 
-        // 3. Save to Dashboard Store
-        const { addContact } = await import('../../lib/contactStore');
-        addContact({ name, email, phone, subject, message, voiceNote: files.voiceNote ? path.basename(files.voiceNote[0].filepath || files.voiceNote.filepath) : null });
+        // 2. Save to GitHub Dashboard Store
+        await addContact({ name, email, phone, subject, message, voiceNoteUrl });
 
-        return res.status(200).json({ success: true, message: 'Message sent successfully! Emails dispatched.' });
+        return res.status(200).json({ success: true, message: 'Message sent successfully!' });
     } catch (err) {
         console.error('Contact error:', err);
         return res.status(500).json({ success: false, message: 'Failed to process message.' });
