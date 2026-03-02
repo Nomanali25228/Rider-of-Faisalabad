@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle } from 'react-icons/fi';
+import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle, FiTrash2 } from 'react-icons/fi';
 import styles from './AdminOrderTable.module.css';
 
 const STATUS_OPTIONS = ['Pending', 'Accepted', 'In Progress', 'Delivered'];
@@ -22,7 +22,7 @@ const REJECTION_SUGGESTIONS = [
     "Service is temporarily unavailable."
 ];
 
-export default function AdminOrderTable({ orders = [], onStatusChange }) {
+export default function AdminOrderTable({ orders = [], onStatusChange, onDelete }) {
     const [selected, setSelected] = useState(null);
     const [updating, setUpdating] = useState(null);
     const detailRef = useRef(null);
@@ -188,6 +188,19 @@ export default function AdminOrderTable({ orders = [], onStatusChange }) {
                                             {order.status === 'Rejected' && (
                                                 <span className={styles.cancelledLabel}>Order Cancelled</span>
                                             )}
+
+                                            <button
+                                                className={`${styles.iconBtn} ${styles.rejectBtn}`}
+                                                style={{ marginLeft: '8px' }}
+                                                onClick={() => {
+                                                    if (window.confirm('Are you sure you want to delete this order?')) {
+                                                        onDelete?.(order._id || order.trackingId);
+                                                    }
+                                                }}
+                                                title="Delete Order"
+                                            >
+                                                <FiTrash2 size={15} />
+                                            </button>
                                         </div>
                                     </td>
                                 </motion.tr>

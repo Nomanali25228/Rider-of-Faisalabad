@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiEye, FiMic, FiPhone, FiMail, FiCalendar } from 'react-icons/fi';
+import { FiEye, FiMic, FiPhone, FiMail, FiCalendar, FiTrash2, FiX } from 'react-icons/fi';
 import styles from './AdminOrderTable.module.css'; // Reusing similar table styles
 
-export default function AdminContactTable({ contacts = [] }) {
+export default function AdminContactTable({ contacts = [], onDelete }) {
     const [selected, setSelected] = useState(null);
     const detailRef = useRef(null);
 
@@ -86,6 +86,18 @@ export default function AdminContactTable({ contacts = [] }) {
                                                     <FiMic size={15} />
                                                 </button>
                                             )}
+                                            <button
+                                                className={`${styles.iconBtn} ${styles.rejectBtn}`}
+                                                style={{ marginLeft: '8px' }}
+                                                onClick={() => {
+                                                    if (window.confirm('Are you sure you want to delete this inquiry?')) {
+                                                        onDelete?.(contact._id);
+                                                    }
+                                                }}
+                                                title="Delete Inquiry"
+                                            >
+                                                <FiTrash2 size={15} />
+                                            </button>
                                         </div>
                                     </td>
                                 </motion.tr>

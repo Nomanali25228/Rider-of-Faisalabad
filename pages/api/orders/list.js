@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { status, page = 1, limit = 20 } = req.query;
+        const { status, page = 1, limit = 12 } = req.query;
         const allOrders = await getOrders();
 
         let filtered = [...allOrders];
@@ -32,10 +32,21 @@ export default async function handler(req, res) {
         const start = (Number(page) - 1) * Number(limit);
         const paginated = filtered.slice(start, start + Number(limit));
 
+        // Global stats for dashboard
+        const stats = {
+            total: allOrders.length,
+            pending: allOrders.filter(o => o.status === 'Pending').length,
+            accepted: allOrders.filter(o => o.status === 'Accepted').length,
+            inProgress: allOrders.filter(o => o.status === 'In Progress').length,
+            delivered: allOrders.filter(o => o.status === 'Delivered').length,
+            rejected: allOrders.filter(o => o.status === 'Rejected').length,
+        };
+
         return res.status(200).json({
             success: true,
             orders: paginated,
-            total: filtered.length,
+            totalCount: filtered.length,
+            stats,
             page: Number(page),
             totalPages: Math.ceil(filtered.length / Number(limit)),
         });

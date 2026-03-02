@@ -24,22 +24,27 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
     const [view, setView] = useState('orders'); // 'orders', 'contacts', or 'reviews'
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [orderStats, setOrderStats] = useState({ total: 0, pending: 0, inProgress: 0, delivered: 0, rejected: 0 });
     const [isAuth, setIsAuth] = useState(false);
     const router = useRouter();
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = async (p = page, f = filter) => {
         const token = localStorage.getItem('admin_token');
         if (!token) return;
 
         setLoading(true);
         try {
-            // Fetch Orders
-            const ordersRes = await fetch('/api/orders/list', {
+            // Fetch Orders with explicit page and filter
+            const ordersRes = await fetch(`/api/orders/list?page=${p}&status=${f}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const ordersData = await ordersRes.json();
             if (ordersData.success) {
                 setOrders(ordersData.orders);
+                setTotalPages(ordersData.totalPages || 1);
+                setOrderStats(ordersData.stats || { total: 0, pending: 0, inProgress: 0, delivered: 0, rejected: 0 });
             }
 
             // Fetch Contacts
@@ -70,14 +75,16 @@ export default function DashboardPage() {
             router.replace('/login');
         } else {
             setIsAuth(true);
-            fetchDashboardData();
+            fetchDashboardData(page, filter);
         }
-    }, [router]);
+    }, [router, page, filter]);
 
     const stats = {
-        total: orders.length,
-        pending: orders.filter(o => o.status === 'Pending').length,
-        inProgress: orders.filter(o => o.status === 'In Progress').length,
+        total: orderStats.total,
+        pending: orderStats.pending,
+        inProgress: orderStats.inProgress,
+        delivered: orderStats.delivered,
+        rejected: orderStats.rejected,
         contacts: contacts.length,
         reviews: reviews.length,
     };
@@ -87,7 +94,14 @@ export default function DashboardPage() {
         { key: 'contacts', label: 'Inquiries', icon: <FiMail size={22} />, color: '#7c3aed' },
     ];
 
-    const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+    // Filter is now handled by the API for better performance and correct counting
+    const filtered = orders;
+
+    const handleFilterChange = (newFilter) => {
+        setFilter(newFilter);
+        setPage(1);
+        fetchDashboardData(1, newFilter); // Explicitly fetch page 1 with new filter
+    };
 
     const handleStatusChange = async (orderId, newStatus, rejectionReason) => {
         const token = localStorage.getItem('admin_token');
@@ -112,6 +126,30 @@ export default function DashboardPage() {
         } catch (err) {
             toast.error('Failed to update status.');
             return false;
+        }
+    };
+
+    const handleDelete = async (type, id) => {
+        const token = localStorage.getItem('admin_token');
+        const endpoint = `/api/${type}/delete`;
+        try {
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ id }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                toast.success('Deleted successfully');
+                fetchDashboardData(page, filter);
+            } else {
+                toast.error(data.message || 'Failed to delete');
+            }
+        } catch (err) {
+            toast.error('Error deleting item');
         }
     };
 
@@ -151,7 +189,7 @@ export default function DashboardPage() {
                     <div className={styles.dbHeaderRight}>
                         <button
                             className={styles.refreshBtn}
-                            onClick={fetchDashboardData}
+                            onClick={() => fetchDashboardData(page, filter)}
                             disabled={loading}
                             aria-label="Refresh data"
                         >
@@ -228,12 +266,12 @@ export default function DashboardPage() {
                                         <button
                                             key={key}
                                             className={`${styles.filterTab} ${filter === key ? styles.filterTabActive : ''}`}
-                                            onClick={() => setFilter(key)}
+                                            onClick={() => handleFilterChange(key)}
                                         >
                                             {label}
                                             {key !== 'all' && (
                                                 <span className={styles.tabCount}>
-                                                    {orders.filter(o => o.status === key).length}
+                                                    {orderStats[key === 'In Progress' ? 'inProgress' : key.toLowerCase()] || 0}
                                                 </span>
                                             )}
                                         </button>
@@ -249,12 +287,43 @@ export default function DashboardPage() {
                             </div>
                         ) : (
                             view === 'orders' ? (
-                                <AdminOrderTable orders={filtered} onStatusChange={handleStatusChange} />
+                                <AdminOrderTable
+                                    orders={filtered}
+                                    onStatusChange={handleStatusChange}
+                                    onDelete={(id) => handleDelete('orders', id)}
+                                />
                             ) : view === 'reviews' ? (
-                                <AdminReviewTable reviews={reviews} />
+                                <AdminReviewTable
+                                    reviews={reviews}
+                                    onDelete={(id) => handleDelete('reviews', id)}
+                                />
                             ) : (
-                                <AdminContactTable contacts={contacts} />
+                                <AdminContactTable
+                                    contacts={contacts}
+                                    onDelete={(id) => handleDelete('contact', id)}
+                                />
                             )
+                        )}
+
+                        {/* Pagination for Orders */}
+                        {view === 'orders' && totalPages > 1 && (
+                            <div className={styles.pagination}>
+                                <button
+                                    className={styles.pageBtn}
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                >
+                                    Previous
+                                </button>
+                                <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
+                                <button
+                                    className={styles.pageBtn}
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         )}
                     </div>
                 </main>

@@ -1,7 +1,7 @@
-import { FiStar, FiMail } from 'react-icons/fi';
+import { FiStar, FiMail, FiTrash2 } from 'react-icons/fi';
 import styles from './AdminOrderTable.module.css';
 
-export default function AdminReviewTable({ reviews }) {
+export default function AdminReviewTable({ reviews, onDelete }) {
     const renderStars = (rating) => {
         return Array.from({ length: 5 }, (_, i) => (
             <span key={i} style={{ color: i < rating ? '#F4C542' : '#ddd', fontSize: 16 }}>★</span>
@@ -28,6 +28,7 @@ export default function AdminReviewTable({ reviews }) {
                         <th>Review</th>
                         <th>Location</th>
                         <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,6 +87,20 @@ export default function AdminReviewTable({ reviews }) {
                                         day: '2-digit', month: 'short', year: 'numeric'
                                     }) : '—'}
                                 </span>
+                            </td>
+                            {/* Actions */}
+                            <td>
+                                <button
+                                    className={`${styles.iconBtn} ${styles.rejectBtn}`}
+                                    onClick={() => {
+                                        if (window.confirm('Are you sure you want to delete this review?')) {
+                                            onDelete?.(review.id || review._id);
+                                        }
+                                    }}
+                                    title="Delete Review"
+                                >
+                                    <FiTrash2 size={15} />
+                                </button>
                             </td>
                         </tr>
                     ))}
