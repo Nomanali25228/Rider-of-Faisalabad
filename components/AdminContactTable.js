@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiEye, FiMic, FiPhone, FiMail, FiCalendar, FiTrash2, FiX } from 'react-icons/fi';
+import { FiEye, FiMic, FiPhone, FiMail, FiCalendar, FiTrash2, FiX, FiImage } from 'react-icons/fi';
 import styles from './AdminOrderTable.module.css'; // Reusing similar table styles
 
 export default function AdminContactTable({ contacts = [], onDelete }) {
     const [selected, setSelected] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     const detailRef = useRef(null);
 
     // Auto-scroll to details when opened
@@ -77,13 +78,22 @@ export default function AdminContactTable({ contacts = [], onDelete }) {
                                             >
                                                 <FiEye size={15} />
                                             </button>
-                                            {contact.voiceNote && (
+                                            {(contact.voiceNoteUrl || contact.voiceNote) && (
                                                 <button
                                                     onClick={() => handleSelectContact(contact)}
                                                     className={`${styles.iconBtn} ${styles.voiceBtn}`}
                                                     title="Listen to Voice Note"
                                                 >
                                                     <FiMic size={15} />
+                                                </button>
+                                            )}
+                                            {(contact.attachmentUrl) && (
+                                                <button
+                                                    onClick={() => handleSelectContact(contact)}
+                                                    className={`${styles.iconBtn} ${styles.acceptBtn}`}
+                                                    title="View Attachment"
+                                                >
+                                                    <FiImage size={15} />
                                                 </button>
                                             )}
                                             <button
@@ -143,19 +153,56 @@ export default function AdminContactTable({ contacts = [], onDelete }) {
                                 {selected.message}
                             </p>
                         </div>
-                        {selected.voiceNote && (
+                        {(selected.voiceNoteUrl || selected.voiceNote) && (
                             <div className={`${styles.detailItem} ${styles.detailFull}`}>
                                 <span className={styles.detailLabel}><FiMic size={12} /> Customer Voice Recording</span>
                                 <div style={{ marginTop: '10px', background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #eef2f6' }}>
-                                    <audio controls src={`/uploads/${selected.voiceNote}`} style={{ width: '100%', height: '36px' }}>
+                                    <audio controls src={selected.voiceNoteUrl || `/uploads/${selected.voiceNote}`} style={{ width: '100%', height: '36px' }}>
                                         Your browser does not support audio.
                                     </audio>
+                                </div>
+                            </div>
+                        )}
+                        {selected.attachmentUrl && (
+                            <div className={`${styles.detailItem} ${styles.detailFull}`}>
+                                <span className={styles.detailLabel}><FiImage size={12} /> Attachment / Screenshot</span>
+                                <div className={styles.screenshotPreview}>
+                                    <p className={styles.screenshotHint}>Verification Screenshot (Click to enlarge):</p>
+                                    <div
+                                        className={styles.screenshotLink}
+                                        onClick={() => setPreviewImage(selected.attachmentUrl)}
+                                    >
+                                        <img src={selected.attachmentUrl} alt="Inquiry Attachment" className={styles.paymentImage} />
+                                        <div className={styles.imgOverlay}><FiEye /> Click to View Full Size</div>
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </div>
                 </motion.div>
             )}
+            {/* Image Preview Lightbox */}
+            <AnimatePresence key="lightbox">
+                {previewImage && (
+                    <div className={styles.lightboxOverlay} onClick={() => setPreviewImage(null)}>
+                        <motion.div
+                            className={styles.lightboxContent}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button className={styles.lightboxClose} onClick={() => setPreviewImage(null)}>
+                                <FiX size={24} />
+                            </button>
+                            <img src={previewImage} alt="Preview" className={styles.lightboxImage} />
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
+
+// Ensure AnimatePresence is imported
+import { AnimatePresence } from 'framer-motion';

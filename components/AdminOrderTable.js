@@ -25,6 +25,7 @@ const REJECTION_SUGGESTIONS = [
 export default function AdminOrderTable({ orders = [], onStatusChange, onDelete }) {
     const [selected, setSelected] = useState(null);
     const [updating, setUpdating] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     const detailRef = useRef(null);
 
     // Auto-scroll to details when opened
@@ -302,11 +303,14 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     <FiImage size={12} /> {selected.attachmentUrl ? 'Initial Attachment / Screenshot' : 'Payment Confirmation'}
                                 </span>
                                 <div className={styles.screenshotPreview}>
-                                    <p className={styles.screenshotHint}>Verification Screenshot:</p>
-                                    <a href={selected.paymentScreenshot || selected.attachmentUrl} target="_blank" rel="noopener noreferrer" className={styles.screenshotLink}>
+                                    <p className={styles.screenshotHint}>Verification Screenshot (Click to enlarge):</p>
+                                    <div
+                                        className={styles.screenshotLink}
+                                        onClick={() => setPreviewImage(selected.paymentScreenshot || selected.attachmentUrl)}
+                                    >
                                         <img src={selected.paymentScreenshot || selected.attachmentUrl} alt="Payment" className={styles.paymentImage} />
-                                        <div className={styles.imgOverlay}>Click to View Full Size</div>
-                                    </a>
+                                        <div className={styles.imgOverlay}><FiEye /> Click to View Full Size</div>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -372,6 +376,26 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     Confirm Rejection
                                 </button>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Image Preview Lightbox */}
+            <AnimatePresence>
+                {previewImage && (
+                    <div className={styles.lightboxOverlay} onClick={() => setPreviewImage(null)}>
+                        <motion.div
+                            className={styles.lightboxContent}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button className={styles.lightboxClose} onClick={() => setPreviewImage(null)}>
+                                <FiX size={24} />
+                            </button>
+                            <img src={previewImage} alt="Preview" className={styles.lightboxImage} />
                         </motion.div>
                     </div>
                 )}

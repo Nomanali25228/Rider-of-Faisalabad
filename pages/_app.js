@@ -6,8 +6,46 @@ import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import ScrollToTop from '../components/ScrollToTop';
 import Head from 'next/head';
+import { useEffect } from 'react';
 
 export default function App({ Component, pageProps, router }) {
+    useEffect(() => {
+        // Clear console on load and periodically in production
+        const clear = () => {
+            if (process.env.NODE_ENV === 'production') {
+                console.clear();
+                console.log('%c Rider of Faisalabad Admin Security Active ', 'background: #2F8F83; color: #fff; font-size: 20px; font-weight: bold; padding: 10px;');
+            }
+        };
+
+        const handleContextMenu = (e) => {
+            // Only disable for admin or globally if requested
+            e.preventDefault();
+        };
+
+        const handleKeyDown = (e) => {
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if (
+                e.keyCode === 123 ||
+                (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+                (e.ctrlKey && e.keyCode === 85)
+            ) {
+                e.preventDefault();
+            }
+        };
+
+        if (process.env.NODE_ENV === 'production') {
+            document.addEventListener('contextmenu', handleContextMenu);
+            document.addEventListener('keydown', handleKeyDown);
+            const interval = setInterval(clear, 5000);
+            return () => {
+                document.removeEventListener('contextmenu', handleContextMenu);
+                document.removeEventListener('keydown', handleKeyDown);
+                clearInterval(interval);
+            };
+        }
+    }, []);
+
     const isAdmin = router.pathname.startsWith('/dashboard');
 
     return (

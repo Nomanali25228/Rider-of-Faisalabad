@@ -96,7 +96,7 @@ export default function LoginPage() {
                                         name="username"
                                         type="text"
                                         className={`form-input ${styles.inputPadded}`}
-                                        placeholder="admin"
+                                        placeholder="UserName"
                                         value={form.username}
                                         onChange={e => setForm(p => ({ ...p, username: e.target.value }))}
                                         required
@@ -131,9 +131,6 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            <div className={styles.hintBox}>
-                                <strong>Demo credentials:</strong> Username: <code>admin</code> | Password: <code>Rider2024!</code>
-                            </div>
 
                             <button
                                 type="submit"

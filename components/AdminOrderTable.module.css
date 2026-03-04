@@ -370,10 +370,11 @@
 }
 
 .premiumItemThumb {
-    width: 45px;
-    height: 45px;
+    width: 100px;
+    height: 100px;
     object-fit: cover;
-    border-radius: 6px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .premiumItemInfo {
@@ -382,14 +383,15 @@
 }
 
 .premiumItemInfo strong {
-    font-size: 13px !important;
+    font-size: 16px !important;
     color: #222;
+    margin-bottom: 4px;
 }
 
 .premiumItemInfo span {
-    font-size: 12px !important;
+    font-size: 15px !important;
     color: #2F8F83 !important;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 /* Screenshot Preview */
@@ -421,6 +423,12 @@
     max-height: 200px;
     object-fit: contain;
     background: #fff;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.screenshotLink:hover .paymentImage {
+    transform: scale(1.02);
 }
 
 .imgOverlay {
@@ -429,15 +437,18 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(47, 143, 131, 0.4);
     color: white;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
 }
 
 .screenshotLink:hover .imgOverlay {
@@ -574,4 +585,68 @@
 .confirmBtn:hover {
     background: #9b2c2c;
     transform: translateY(-1px);
+}
+/* Lightbox */
+.lightboxOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    cursor: zoom-out;
+}
+
+.lightboxContent {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+}
+
+.lightboxImage {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+}
+
+.lightboxClose {
+    position: absolute;
+    top: -50px;
+    right: -20px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lightboxClose:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+    transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+    .lightboxClose {
+        top: -60px;
+        right: 0;
+    }
 }

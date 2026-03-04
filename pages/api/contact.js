@@ -46,10 +46,15 @@ export default async function handler(req, res) {
         let voiceNoteUrl = null;
         if (files.voiceNote) {
             const voiceFile = Array.isArray(files.voiceNote) ? files.voiceNote[0] : files.voiceNote;
-            const fileBuffer = fs.readFileSync(voiceFile.filepath);
-            const uploadResult = await uploadToCloudinary(fileBuffer, 'video', 'contact-voice');
-            voiceNoteUrl = uploadResult.url;
+            voiceNoteUrl = await uploadToCloudinary(voiceFile.filepath, 'contact-voice');
             try { fs.unlinkSync(voiceFile.filepath); } catch (e) { console.error('Error unlinking tmp voice note:', e); }
+        }
+
+        let attachmentUrl = null;
+        if (files.attachment) {
+            const attachmentFile = Array.isArray(files.attachment) ? files.attachment[0] : files.attachment;
+            attachmentUrl = await uploadToCloudinary(attachmentFile.filepath, 'contact-attachments');
+            try { fs.unlinkSync(attachmentFile.filepath); } catch (e) { console.error('Error unlinking tmp attachment:', e); }
         }
 
         // 1. Send Emails
@@ -83,6 +88,11 @@ export default async function handler(req, res) {
                                 <p>🎤 <strong>A voice note was attached:</strong></p>
                                 <a href="${voiceNoteUrl}" style="background: #2F8F83; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">Listen to Voice Note</a>
                             </div>` : ''}
+                            ${attachmentUrl ? `
+                            <div style="margin-top: 10px; padding: 15px; background: #f0f4ff; border-radius: 8px;">
+                                <p>📎 <strong>A file/screenshot was attached:</strong></p>
+                                <a href="${attachmentUrl}" style="background: #6366f1; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">View Attachment</a>
+                            </div>` : ''}
                         </div>
                     `,
                 });
@@ -114,7 +124,7 @@ export default async function handler(req, res) {
         }
 
         // 2. Save to GitHub Dashboard Store
-        await addContact({ name, email, phone, subject, message, voiceNoteUrl });
+        await addContact({ name, email, phone, subject, message, voiceNoteUrl, attachmentUrl });
 
         return res.status(200).json({ success: true, message: 'Message sent successfully!' });
     } catch (err) {

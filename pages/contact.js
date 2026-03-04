@@ -19,12 +19,14 @@ export default function ContactPage() {
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState({});
     const [voiceFile, setVoiceFile] = useState(null);
+    const [attachment, setAttachment] = useState(null);
     const [isRecording, setIsRecording] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [audioUrl, setAudioUrl] = useState(null);
     const mediaRecorderRef = useRef(null);
     const chunksRef = useRef([]);
     const timerRef = useRef(null);
+    const fileInputRef = useRef(null);
     const successRef = useRef(null);
 
     // Auto-scroll to success
@@ -93,6 +95,18 @@ export default function ContactPage() {
         setRecordingTime(0);
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('File too large! Max 5MB allowed.');
+                return;
+            }
+            setAttachment(file);
+            toast.success('File attached: ' + file.name);
+        }
+    };
+
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -126,6 +140,9 @@ export default function ContactPage() {
             });
             if (voiceFile) {
                 formData.append('voiceNote', voiceFile);
+            }
+            if (attachment) {
+                formData.append('attachment', attachment);
             }
 
             const res = await fetch('/api/contact', {
@@ -273,6 +290,36 @@ export default function ContactPage() {
                                                 />
                                                 {errors.message && <span className={styles.errorMsg}>{errors.message}</span>}
                                             </div>
+                                            {/* File Attachment */}
+                                            <div className="form-group">
+                                                <label className="form-label"><FiUpload size={14} /> Attachment (Optional)</label>
+                                                <input
+                                                    type="file"
+                                                    ref={fileInputRef}
+                                                    style={{ display: 'none' }}
+                                                    onChange={handleFileChange}
+                                                    accept="image/*,.pdf,.doc,.docx"
+                                                />
+                                                {!attachment ? (
+                                                    <div
+                                                        className={styles.uploadZone}
+                                                        onClick={() => fileInputRef.current?.click()}
+                                                    >
+                                                        <FiUpload size={20} className={styles.uploadIcon} />
+                                                        <span className={styles.uploadText}>Click to upload files or screenshot</span>
+                                                        <span className={styles.uploadSubtext}>Max 5MB (JPG, PNG, PDF)</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className={styles.filePreview}>
+                                                        <FiUpload size={18} color="#2F8F83" />
+                                                        <span className={styles.fileName}>{attachment.name}</span>
+                                                        <button type="button" className={styles.deleteVoice} onClick={() => setAttachment(null)}>
+                                                            <FiTrash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             {/* Live Voice Note */}
                                             <div className="form-group">
                                                 <label className="form-label"><FiMic size={14} /> Live Voice Note (Optional)</label>
