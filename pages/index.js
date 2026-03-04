@@ -1,25 +1,19 @@
 import Head from 'next/head';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { motion } from 'framer-motion';
-import { FiPackage, FiStar, FiShield, FiClock, FiGlobe, FiMapPin, FiCheck } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiPackage, FiStar, FiShield, FiClock, FiGlobe, FiMapPin, FiCheck, FiCopy } from 'react-icons/fi';
+import toast from 'react-hot-toast';
 import { MdDeliveryDining, MdOutlineElectricBike } from 'react-icons/md';
 import { BsGift } from 'react-icons/bs';
 import Hero from '../components/Hero';
-import ServiceCard from '../components/ServiceCard';
 import ReviewSection from '../components/ReviewSection';
 import OrderForm from '../components/OrderForm';
 import styles from './index.module.css';
 
-const services = [
-    { icon: <FiClock size={28} />, title: 'Same Day Delivery', description: 'Get your parcel delivered within Faisalabad on the same day. Guaranteed speed & safety.', color: '#2F8F83' },
-    { icon: <BsGift size={28} />, title: 'Gift Delivery', description: 'Valentine\'s, birthdays, anniversaries — we deliver joy with personal care.', color: '#e879a0' },
-    { icon: <FiShield size={28} />, title: 'Confidential Delivery', description: 'Sensitive documents and private parcels handled with full discretion.', color: '#7c3aed' },
-    { icon: <MdOutlineElectricBike size={28} />, title: 'Urgent Delivery', description: 'Lightning-fast delivery for time-critical parcels. Available 6 AM – 10 PM.', color: '#F4C542' },
-    { icon: <FiMapPin size={28} />, title: 'Punjab Rider Service', description: 'City-to-city delivery across all major Punjab cities at affordable rates.', color: '#2F8F83' },
-    { icon: <FiGlobe size={28} />, title: 'International Delivery', description: 'Send and receive parcels between Pakistan and abroad, securely handled.', color: '#0ea5e9' },
-];
+import { galleryItems } from '../lib/products';
+import { FiCamera } from 'react-icons/fi';
 
 const whyUs = [
     { icon: '⚡', title: 'Super Fast', desc: 'Same-day & urgent delivery options within hours.' },
@@ -65,8 +59,19 @@ const fadeUp = {
     }),
 };
 
+// Curate a mixed selection of items for homepage
+const featuredProductIds = [1, 10, 3, 6, 13, 22, 14, 33];
+const featuredProducts = (galleryItems || []).filter(item => featuredProductIds.includes(item.id));
+
 export default function HomePage() {
     const router = useRouter();
+    const [hasProducts, setHasProducts] = useState(false);
+    const [cartRefresh, setCartRefresh] = useState(0);
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Number copied!');
+    };
 
     useEffect(() => {
         // Handle cross-page scrolling to #quick-order
@@ -80,6 +85,26 @@ export default function HomePage() {
             return () => clearTimeout(timer);
         }
     }, [router.asPath]);
+
+    const handleOrderNow = (item) => {
+        const existing = localStorage.getItem('selectedProducts');
+        let products = [];
+        try {
+            products = existing ? JSON.parse(existing) : [];
+            if (!Array.isArray(products)) products = [];
+        } catch (e) { products = []; }
+        products.push(item);
+        localStorage.setItem('selectedProducts', JSON.stringify(products));
+        localStorage.removeItem('selectedProduct');
+        setCartRefresh(v => v + 1);
+
+        // Use standard JS query instead of smooth scroll hook for simplicity
+        const element = document.getElementById('quick-order');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
 
     return (
         <>
@@ -144,7 +169,7 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                {/* Services Preview */}
+                {/* Our Shop Preview */}
                 <section className="section" style={{ background: 'var(--bg)' }}>
                     <div className="container">
                         <motion.div
@@ -154,18 +179,45 @@ export default function HomePage() {
                             whileInView="visible"
                             viewport={{ once: true }}
                         >
-                            <span className="section-badge"><FiPackage size={12} /> Our Services</span>
-                            <h2 className="section-title">Everything You Need <span>Delivered</span></h2>
-                            <p className="section-subtitle">From regular parcels to urgent gifts — we cover every delivery need.</p>
+                            <span className="section-badge"><FiCamera size={12} /> Our Shop</span>
+                            <h2 className="section-title">Order Premium <span>Products</span></h2>
+                            <p className="section-subtitle">Delicious cakes, fresh bouquets and custom gifts delivered with care.</p>
                         </motion.div>
-                        <div className={styles.servicesGrid}>
-                            {services.map(({ icon, title, description, color }, i) => (
-                                <ServiceCard key={title} icon={icon} title={title} description={description} color={color} delay={i * 0.08} />
+
+                        <div className={styles.productGrid}>
+                            {featuredProducts.map((item, i) => (
+                                <motion.div
+                                    key={item.id}
+                                    className={styles.pCard}
+                                    variants={fadeUp}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    custom={i}
+                                    viewport={{ once: true }}
+                                    whileHover={{ y: -5 }}
+                                >
+                                    <div className={styles.pImageWrapper}>
+                                        <img src={item.image} alt={item.label} className={styles.pCardImage} />
+                                    </div>
+                                    <div className={styles.pCardFooter}>
+                                        <span className={styles.pCardLabel}>{item.label}</span>
+                                        <div className={styles.pCardPriceRow}>
+                                            <span className={styles.pCardPrice}>RS. {item.price}</span>
+                                            <button
+                                                className={styles.pOrderBtn}
+                                                onClick={() => handleOrderNow(item)}
+                                            >
+                                                Order Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
                             ))}
                         </div>
+
                         <div style={{ textAlign: 'center', marginTop: 40 }}>
-                            <Link href="/services" className="btn btn-teal btn-lg" id="home-all-services-btn">
-                                View All Services
+                            <Link href="/gallery" className="btn btn-teal btn-lg">
+                                View Our Full Shop
                             </Link>
                         </div>
                     </div>
@@ -273,13 +325,77 @@ export default function HomePage() {
                                     ))}
                                 </ul>
 
-                                <div className={styles.orderNotice}>
-                                    <div className={styles.noticeIcon}><FiClock size={20} /></div>
-                                    <div className={styles.noticeContent}>
-                                        <p className={styles.urduText}>بکنگ کے 30 منٹ کے اندر آپ کو کل چارجز بتا دیے جائیں گے۔</p>
-                                        <p className={styles.englishText}>Total delivery cost will be shared with you within <strong>30 minutes</strong> of order submission.</p>
-                                    </div>
-                                </div>
+                                <AnimatePresence mode="wait">
+                                    {hasProducts ? (
+                                        <motion.div
+                                            key="payment-notice"
+                                            className={styles.premiumOrderNotice}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 20 }}
+                                        >
+                                            <div className={styles.premiumHeader}>
+                                                <div className={styles.premiumIcon}>💰</div>
+                                                <div>
+                                                    <h4 className={styles.premiumTitle}>Payment Details (Required for Shop Items)</h4>
+                                                    <p className={styles.premiumTagline}>Kindly payment karke screenshot lazmi attach karke order submit kariyega, shukriya!</p>
+                                                </div>
+                                            </div>
+
+                                            <div className={styles.formPaymentMethods}>
+                                                <div className={styles.formMethod}>
+                                                    <div className={styles.methodHead}>
+                                                        <img src="/uploads/jazzcash.png" className={styles.methodLogo} alt="JC" />
+                                                        <strong>JazzCash</strong>
+                                                    </div>
+                                                    <div className={styles.methodNum}>
+                                                        <span>0300-1234567</span>
+                                                        <button type="button" onClick={() => copyToClipboard('0300-1234567')}><FiCopy size={12} /></button>
+                                                    </div>
+                                                    <span className={styles.methodHolderName}>Waqas Ahmed</span>
+                                                </div>
+
+                                                <div className={styles.formMethod}>
+                                                    <div className={styles.methodHead}>
+                                                        <img src="/uploads/easypaisa.jpg" className={styles.methodLogo} alt="EP" />
+                                                        <strong>EasyPaisa</strong>
+                                                    </div>
+                                                    <div className={styles.methodNum}>
+                                                        <span>0300-1234567</span>
+                                                        <button type="button" onClick={() => copyToClipboard('0300-1234567')}><FiCopy size={12} /></button>
+                                                    </div>
+                                                    <span className={styles.methodHolderName}>Waqas Ahmed</span>
+                                                </div>
+
+                                                <div className={`${styles.formMethod} ${styles.fullMethod}`}>
+                                                    <div className={styles.methodHead}>
+                                                        <img src="/uploads/hbl.png" className={styles.methodLogo} alt="HBL" />
+                                                        <strong>HBL Bank</strong>
+                                                    </div>
+                                                    <div className={styles.methodNum}>
+                                                        <span>12345678901234</span>
+                                                        <button type="button" onClick={() => copyToClipboard('12345678901234')}><FiCopy size={12} /></button>
+                                                    </div>
+                                                    <span className={styles.methodHolderName}>Title: Waqas Ahmed</span>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="standard-notice"
+                                            className={styles.orderNotice}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 20 }}
+                                        >
+                                            <div className={styles.noticeIcon}><FiClock size={20} /></div>
+                                            <div className={styles.noticeContent}>
+                                                <p className={styles.urduText}>بکنگ کے 30 منٹ کے اندر آپ کو کل چارجز بتا دیے جائیں گے۔</p>
+                                                <p className={styles.englishText}>Total delivery cost will be shared with you within <strong>30 minutes</strong> of order submission.</p>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                                 <p className={styles.urduSlogan}>فوری سروس، بھروسہ مند سفر - صرف رائیڈر آف فیصل آباد کے ساتھ!</p>
                             </motion.div>
                             <motion.div
@@ -291,7 +407,11 @@ export default function HomePage() {
                                 className={styles.formCard}
                             >
                                 <h3 className={styles.formCardTitle}>📦 New Order</h3>
-                                <OrderForm compact />
+                                <OrderForm
+                                    compact
+                                    onProductsChange={setHasProducts}
+                                    cartRefresh={cartRefresh}
+                                />
                             </motion.div>
                         </div>
                     </div>

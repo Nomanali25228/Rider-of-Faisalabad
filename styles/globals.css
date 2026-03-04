@@ -52,6 +52,7 @@ body {
   background: var(--bg);
   color: var(--dark);
   line-height: 1.6;
+  /* Space for announcement bar (40px) + navbar (72px) */
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

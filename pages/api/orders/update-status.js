@@ -81,16 +81,28 @@ async function getTransporter() {
 
 async function sendAcceptedEmail(order) {
     const transporter = await getTransporter();
+    const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rider-of-faisalabad.vercel.app'}/track-order?id=${order.trackingId}`;
+
     await transporter.sendMail({
         from: `"Rider of Faisalabad" <${process.env.SMTP_USER}>`,
         to: order.email,
-        subject: `Order Accepted — ${order.trackingId}`,
+        subject: `Order Accepted! — ${order.trackingId}`,
         html: `
-            <div style="font-family:sans-serif; max-width:500px; margin:0 auto; padding:20px; border:1px solid #eee; border-radius:10px;">
-                <h2 style="color:#2F8F83;">Order Accepted!</h2>
+            <div style="font-family:sans-serif; max-width:500px; margin:0 auto; padding:20px; border:1px solid #eee; border-radius:15px;">
+                <h2 style="color:#2F8F83; text-align:center;">Order Accepted!</h2>
                 <p>Hello <strong>${order.fullName}</strong>,</p>
-                <p>Good news! Your order <strong>${order.trackingId}</strong> has been accepted. A rider will be assigned to your pick-up location soon.</p>
+                <p>Good news! Your order <strong>${order.trackingId}</strong> has been accepted. We are ready to process your delivery.</p>
+                
+                <div style="background:#fdfaf0; padding:20px; border-radius:12px; border:1.5px solid #F4C542; margin:20px 0;">
+                    <p style="margin-top:0;"><strong>Action Required: Payment</strong></p>
+                    <p>To move your order to <strong>"In Progress"</strong>, please make the payment and upload the screenshot on our website.</p>
+                    <div style="text-align:center; margin-top:20px;">
+                        <a href="${trackingUrl}" style="background:#2F8F83; color:white; padding:12px 25px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">Upload Payment Screenshot</a>
+                    </div>
+                </div>
+
                 <p>Thank you for choosing Rider of Faisalabad!</p>
+                <p style="font-size:12px; color:#888;">If you've already paid, please ignore this email or visit the tracking link to check status.</p>
             </div>
         `,
     });

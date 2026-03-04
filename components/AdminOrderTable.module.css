@@ -316,6 +316,134 @@
     }
 }
 
+/* Payment Status Indicator */
+.paymentStatusDot {
+    width: 8px;
+    height: 8px;
+    background: #059669;
+    border-radius: 50%;
+    position: relative;
+}
+
+.dotPulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #059669;
+    border-radius: 50%;
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(5, 150, 105, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
+    }
+}
+
+/* Premium Items List */
+.premiumItemsList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.premiumItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #fdfaf0;
+    border: 1px solid #F4C542;
+    border-radius: 10px;
+}
+
+.premiumItemThumb {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.premiumItemInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.premiumItemInfo strong {
+    font-size: 13px !important;
+    color: #222;
+}
+
+.premiumItemInfo span {
+    font-size: 12px !important;
+    color: #2F8F83 !important;
+    font-weight: 700;
+}
+
+/* Screenshot Preview */
+.screenshotPreview {
+    margin-top: 8px;
+    background: #f8fafc;
+    border: 1px dashed rgba(47, 143, 131, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+}
+
+.screenshotHint {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.screenshotLink {
+    display: block;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.paymentImage {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    background: #fff;
+}
+
+.imgOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.screenshotLink:hover .imgOverlay {
+    opacity: 1;
+}
+
 /* Rejection Modal */
 .modalOverlay {
     position: fixed;

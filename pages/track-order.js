@@ -1,15 +1,16 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch, FiClock, FiCheckCircle, FiPackage, FiMapPin, FiTruck, FiAlertCircle, FiStar, FiXCircle } from 'react-icons/fi';
+import { FiSearch, FiClock, FiCheckCircle, FiPackage, FiMapPin, FiTruck, FiAlertCircle, FiStar, FiXCircle, FiUpload, FiTrash2, FiFileText, FiCopy, FiSmartphone } from 'react-icons/fi';
 import styles from './track-order.module.css';
 
 const statusConfig = {
     Pending: { color: '#d97706', bg: '#fef3c7', icon: <FiClock size={20} />, step: 0 },
     Accepted: { color: '#2563eb', bg: '#dbeafe', icon: <FiCheckCircle size={20} />, step: 1 },
-    'In Progress': { color: '#7c3aed', bg: '#ede9fe', icon: <FiTruck size={20} />, step: 2 },
+    'In Progress': { color: '#7c3aed', bg: '#f5f3ff', icon: <FiTruck size={20} />, step: 2 },
     Delivered: { color: '#059669', bg: '#d1fae5', icon: <FiCheckCircle size={20} />, step: 3 },
     Rejected: { color: '#dc2626', bg: '#fee2e2', icon: <FiAlertCircle size={20} />, step: -1 },
 };
@@ -24,10 +25,20 @@ export default function TrackOrderPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    // Feedback State
+    // State
     const [reviewForm, setReviewForm] = useState({ rating: 0, text: '' });
     const [reviewSubmitting, setReviewSubmitting] = useState(false);
     const [reviewSubmitted, setReviewSubmitted] = useState(false);
+
+    // Payment State
+    const [paymentFile, setPaymentFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploaded, setUploaded] = useState(false);
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Number copied!');
+    };
 
     useEffect(() => {
         if (id) {
@@ -60,6 +71,36 @@ export default function TrackOrderPage() {
         e.preventDefault();
         if (!trackingId.trim()) return;
         performTracking(trackingId);
+    };
+
+    const handlePaymentUpload = async (e) => {
+        e.preventDefault();
+        if (!paymentFile || !order) return;
+
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('paymentScreenshot', paymentFile);
+            formData.append('orderId', order.id);
+            formData.append('trackingId', order.trackingId);
+
+            const res = await fetch('/api/orders/upload-screenshot', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+            if (data.success) {
+                setUploaded(true);
+                setOrder(prev => ({ ...prev, status: 'In Progress', paymentScreenshot: data.url }));
+            } else {
+                alert(data.message || 'Upload failed.');
+            }
+        } catch (err) {
+            console.error('Upload error:', err);
+            alert('Something went wrong. Please try again.');
+        } finally {
+            setUploading(false);
+        }
     };
 
     const handleReviewSubmit = async (e) => {
@@ -181,36 +222,6 @@ export default function TrackOrderPage() {
                                             </div>
                                         </div>
 
-                                        {/* Rejected Card */}
-                                        {order.status === 'Rejected' && (
-                                            <motion.div
-                                                className={styles.rejectedCard}
-                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                            >
-                                                <div className={styles.rejectedIcon}>
-                                                    <FiXCircle size={40} />
-                                                </div>
-                                                <h2 className={styles.rejectedTitle}>Order Not Accepted</h2>
-                                                <p className={styles.rejectedSub}>We apologize, but your order could not be processed at this time.</p>
-
-                                                {order.rejectionReason && (
-                                                    <div className={styles.reasonInfo}>
-                                                        <strong>Reason from Office:</strong>
-                                                        <p>&ldquo;{order.rejectionReason}&rdquo;</p>
-                                                    </div>
-                                                )}
-
-                                                <div className={styles.rejectedActions}>
-                                                    <Link href="/contact" className="btn btn-outline">
-                                                        Contact Support
-                                                    </Link>
-                                                    <Link href="/" className="btn btn-teal">
-                                                        Place New Order
-                                                    </Link>
-                                                </div>
-                                            </motion.div>
-                                        )}
 
                                         {/* Progress Steps */}
                                         {order.status !== 'Rejected' && (
@@ -264,14 +275,33 @@ export default function TrackOrderPage() {
                                                     <strong>{order.dropAddress}</strong>
                                                 </div>
                                             </div>
+                                            {order.productDetails && (
+                                                <div className={`${styles.detailItem} ${styles.detailFullWidth}`}>
+                                                    <FiFileText size={16} className={styles.detailIcon} />
+                                                    <div style={{ width: '100%' }}>
+                                                        <span className={styles.detailLabel}>Included Shop Items</span>
+                                                        <div className={styles.premiumItemsRow}>
+                                                            {(() => {
+                                                                try {
+                                                                    const items = JSON.parse(order.productDetails);
+                                                                    const itemsArray = Array.isArray(items) ? items : [items];
+                                                                    return itemsArray.map((item, idx) => (
+                                                                        <div key={idx} className={styles.premiumMiniItem}>
+                                                                            <img src={item.image} alt={item.label} />
+                                                                            <div className={styles.miniInfo}>
+                                                                                <span>{item.label}</span>
+                                                                                <strong>RS. {item.price}</strong>
+                                                                            </div>
+                                                                        </div>
+                                                                    ));
+                                                                } catch (e) { return <span>Order details attached.</span>; }
+                                                            })()}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
-                                        {order.estimatedTime && (
-                                            <div className={styles.etaBox}>
-                                                <FiClock size={16} />
-                                                <span>Estimated delivery time: <strong>{order.estimatedTime}</strong></span>
-                                            </div>
-                                        )}
                                     </div>
 
                                     {/* Feedback Section (Shown if delivered) */}

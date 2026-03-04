@@ -1,7 +1,8 @@
 .pageHero {
     position: relative;
     background: linear-gradient(150deg, #0d3530 0%, #2F8F83 100%);
-    padding: 100px 0 80px;
+    padding: 140px 0 80px;
+    /* 40px (Announcement) + 100px */
     overflow: hidden;
 }
 

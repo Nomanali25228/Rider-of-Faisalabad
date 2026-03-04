@@ -1,7 +1,8 @@
 .pageHero {
     position: relative;
     background: linear-gradient(150deg, #0d3530, #2F8F83);
-    padding: 80px 0 100px;
+    padding: 120px 0 100px;
+    /* 40px (Announcement) + 80px */
     overflow: hidden;
 }
 
@@ -364,6 +365,55 @@
     margin-top: 2px;
 }
 
+.detailFullWidth {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(47, 143, 131, 0.1);
+    padding-top: 16px;
+    margin-top: 8px;
+}
+
+.premiumItemsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.premiumMiniItem {
+    flex: 1;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(244, 197, 66, 0.2);
+}
+
+.premiumMiniItem img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.miniInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.miniInfo span {
+    font-size: 12px;
+    color: #555;
+    font-weight: 500;
+}
+
+.miniInfo strong {
+    font-size: 12px !important;
+    color: #2F8F83 !important;
+}
+
 .etaBox {
     display: flex;
     align-items: center;
@@ -441,9 +491,285 @@
     color: #888;
 }
 
+/* Charges Notice */
+.chargesNotice {
+    background: #fdfaf0;
+    border: 1px solid #F4C542;
+    border-radius: 20px;
+    padding: 24px;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.noticeIcon {
+    width: 60px;
+    height: 60px;
+    background: white;
+    color: #F4C542;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(244, 197, 66, 0.15);
+}
+
+.noticeContent h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #222;
+    margin: 0 0 4px;
+}
+
+.noticeContent p {
+    font-size: 15px;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+    .chargesNotice {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+}
+
+.paymentBadge {
+    display: inline-block;
+    background: #F4C542;
+    color: #000;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.paymentTitle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #222;
+    margin: 0 0 10px;
+}
+
+.paymentSub {
+    font-size: 15px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.paymentMethods {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.methodCard {
+    background: white;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(244, 197, 66, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.methodFull {
+    grid-column: 1 / -1;
+}
+
+.methodHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.methodIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.methodBrand {
+    font-size: 14px;
+    font-weight: 700;
+    color: #222;
+}
+
+.methodDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.numberRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.numberRow strong {
+    font-size: 16px;
+    color: #2F8F83;
+    letter-spacing: 0.02em;
+}
+
+.copyBtn {
+    background: #f1f5f9;
+    border: none;
+    color: #64748b;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.copyBtn:hover {
+    background: #2F8F83;
+    color: white;
+}
+
+.accountHolder {
+    font-size: 12px;
+    color: #888;
+    font-weight: 500;
+}
+
+@media (max-width: 640px) {
+    .paymentMethods {
+        grid-template-columns: 1fr;
+    }
+}
+
+.bankInfo {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(244, 197, 66, 0.3);
+    margin-bottom: 24px;
+}
+
+.bankInfo p {
+    margin: 5px 0;
+    font-size: 15px;
+    color: #444;
+}
+
+.bankInfo strong {
+    color: #2F8F83;
+}
+
+.paymentForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.uploadBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: white;
+    border: 1.5px dashed #F4C542;
+    border-radius: 14px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #856404;
+    transition: all 0.2s ease;
+}
+
+.uploadBtn:hover {
+    background: #fff;
+    border-color: #2F8F83;
+    color: #2F8F83;
+}
+
+.selectedFile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #f0fdf4;
+    border-radius: 12px;
+    border: 1px solid #bcf0da;
+}
+
+.fileName {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 600;
+    color: #059669;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: #dc2626;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+}
+
+.confirmBtn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+}
+
+/* Success Message */
+.successMessage {
+    background: #f0fdf4;
+    border: 1px solid #bcf0da;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    color: #065f46;
+}
+
+.successMessage strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.successMessage p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
 @media (max-width: 640px) {
     .pageHero {
-        padding: 60px 0 80px;
+        padding: 100px 0 80px;
+        /* Adjusted for announcement bar */
     }
 
     .heroContent h1 {
@@ -537,6 +863,14 @@
     .rejectedActions a {
         width: 100%;
         text-align: center;
+    }
+
+    .paymentCard {
+        padding: 24px 20px;
+    }
+
+    .paymentTitle {
+        font-size: 20px;
     }
 
     .feedbackCard {

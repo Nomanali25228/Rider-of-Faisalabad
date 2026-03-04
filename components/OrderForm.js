@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare } from 'react-icons/fi';
+import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare, FiCopy } from 'react-icons/fi';
 import styles from './OrderForm.module.css';
 import dynamic from 'next/dynamic';
 
@@ -23,13 +24,78 @@ const initialState = {
     voiceNote: null,
 };
 
-export default function OrderForm({ compact = false }) {
+export default function OrderForm({ compact = false, onProductsChange, cartRefresh }) {
+    const [selectedProducts, setSelectedProducts] = useState([]);
     const [form, setForm] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [trackingId, setTrackingId] = useState(null);
     const [mapMode, setMapMode] = useState(null);
     const [errors, setErrors] = useState({});
+    const [attachment, setAttachment] = useState(null);
+    const fileInputRef = useRef(null);
     const successRef = useRef(null);
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        toast.success('Number copied!');
+    };
+
+    // Load selected products from localStorage
+    useEffect(() => {
+        const savedArr = localStorage.getItem('selectedProducts');
+        const savedSingle = localStorage.getItem('selectedProduct');
+
+        let products = [];
+
+        // Handle migration from single to array
+        if (savedSingle) {
+            try {
+                products.push(JSON.parse(savedSingle));
+                localStorage.removeItem('selectedProduct');
+                localStorage.setItem('selectedProducts', JSON.stringify(products));
+            } catch (e) { }
+        } else if (savedArr) {
+            try {
+                products = JSON.parse(savedArr);
+                if (!Array.isArray(products)) products = [products];
+            } catch (e) { }
+        }
+
+        if (products.length > 0) {
+            setSelectedProducts(products);
+            // Auto-fill parcel type if it's the first item
+            setForm(prev => ({
+                ...prev,
+                parcelType: prev.parcelType || products[0].category || 'Gift',
+                message: prev.message || `I want to order: ${products.map(p => p.label).join(', ')}`
+            }));
+        }
+        if (onProductsChange) onProductsChange(products.length > 0);
+    }, [trackingId, cartRefresh]); // Refresh on reset or cart change
+
+    const removeProduct = (index) => {
+        const updated = selectedProducts.filter((_, i) => i !== index);
+        setSelectedProducts(updated);
+        localStorage.setItem('selectedProducts', JSON.stringify(updated));
+        if (onProductsChange) onProductsChange(updated.length > 0);
+    };
+
+    const clearAllProducts = () => {
+        setSelectedProducts([]);
+        localStorage.removeItem('selectedProducts');
+        if (onProductsChange) onProductsChange(false);
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('File size too large. Max 5MB allowed.');
+                return;
+            }
+            setAttachment(file);
+        }
+    };
 
     // Auto-scroll to success message
     useEffect(() => {
@@ -131,9 +197,14 @@ export default function OrderForm({ compact = false }) {
         if (!form.dropAddress.trim()) newErrors.dropAddress = '📍 Please enter the drop/delivery address.';
         if (!form.parcelType) newErrors.parcelType = '📦 Please select a parcel type.';
 
+        // New: Enforce payment screenshot if shop items are present
+        if (selectedProducts.length > 0 && !attachment) {
+            newErrors.attachment = '💳 Please attach your payment screenshot to proceed with shop items.';
+            toast.error('Payment screenshot is required for shop items.');
+        }
+
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            // Scroll to first error
             const firstErrorKey = Object.keys(newErrors)[0];
             document.getElementById(firstErrorKey)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
@@ -145,6 +216,17 @@ export default function OrderForm({ compact = false }) {
             Object.entries(form).forEach(([key, val]) => {
                 if (val !== null) formData.append(key, val);
             });
+
+            // Add product details if selected
+            if (selectedProducts.length > 0) {
+                formData.append('productDetails', JSON.stringify(selectedProducts));
+            }
+
+            // Add attachment file if present
+            if (attachment) {
+                formData.append('attachment', attachment);
+            }
+
             const res = await fetch('/api/orders/create', {
                 method: 'POST',
                 body: formData,
@@ -154,6 +236,8 @@ export default function OrderForm({ compact = false }) {
                 setTrackingId(data.trackingId);
                 setForm(initialState);
                 deleteRecording();
+                setAttachment(null);
+                clearAllProducts();
                 toast.success('Order placed! Check your email for confirmation.');
             } else {
                 toast.error(data.message || 'Something went wrong.');
@@ -190,6 +274,52 @@ export default function OrderForm({ compact = false }) {
 
     return (
         <form className={`${styles.form} ${compact ? styles.compact : ''}`} onSubmit={handleSubmit} noValidate>
+            {/* Multi-Product Section */}
+            <AnimatePresence>
+                {selectedProducts.length > 0 && (
+                    <div className={styles.productsContainer}>
+                        <div className={styles.sectionHeader}>
+                            <h4 className={styles.sectionLabel}>📦 Items from Our Shop ({selectedProducts.length})</h4>
+                            <button type="button" className={styles.actionBtn} onClick={clearAllProducts} title="Clear all">
+                                <FiTrash2 size={14} /> Clear All
+                            </button>
+                        </div>
+
+                        <div className={styles.productsList}>
+                            {selectedProducts.map((product, idx) => (
+                                <motion.div
+                                    key={`${product.id}-${idx}`}
+                                    className={styles.selectedItemCard}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                >
+                                    <img src={product.image} className={styles.selectedThumb} alt="" />
+                                    <div className={styles.selectedInfo}>
+                                        <span className={styles.selectedName}>{product.label}</span>
+                                        <span className={styles.selectedPriceLabel}>RS. {product.price}</span>
+                                    </div>
+                                    <div className={styles.selectedActions}>
+                                        <button
+                                            type="button"
+                                            className={styles.actionBtn}
+                                            onClick={() => removeProduct(idx)}
+                                            title="Remove item"
+                                        >
+                                            <FiTrash2 size={16} />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        <Link href="/gallery" className={styles.addMorePremiumBtn}>
+                            ➕ Add More Products from Shop
+                        </Link>
+                    </div>
+                )}
+            </AnimatePresence>
+
             <div className={styles.grid}>
                 {/* Full Name */}
                 <div className={`form-group ${styles.fullWidth}`}>
@@ -313,6 +443,9 @@ export default function OrderForm({ compact = false }) {
                         <option value="Electronics">Electronics</option>
                         <option value="Food">Food</option>
                         <option value="Gift">Gift</option>
+                        <option value="Cake">Cake</option>
+                        <option value="Bouquet">Bouquet</option>
+                        <option value="Custom Basket">Custom Basket</option>
                         <option value="Medicine">Medicine</option>
                         <option value="Other">Other</option>
                     </select>
@@ -360,6 +493,46 @@ export default function OrderForm({ compact = false }) {
                         value={form.message}
                         onChange={handleChange}
                     />
+                </div>
+
+                {/* Attachment Upload */}
+                <div className={`form-group ${styles.fullWidth}`} id="attachment">
+                    <label className="form-label">
+                        {selectedProducts.length > 0 ? (
+                            <><span style={{ color: '#dc2626' }}>💳 Payment Screenshot (REQUIRED)</span></>
+                        ) : (
+                            <><FiUpload size={14} /> Upload Screenshot/Files (Optional)</>
+                        )}
+                    </label>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleFileChange}
+                        accept="image/*,.pdf,.doc,.docx"
+                    />
+                    {!attachment ? (
+                        <div
+                            className={`${styles.uploadZone} ${selectedProducts.length > 0 ? styles.requiredZone : ''}`}
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <FiUpload size={24} className={styles.uploadIcon} />
+                            <span className={styles.uploadText}>
+                                {selectedProducts.length > 0 ? 'Upload Payment Screenshot here' : 'Click or drag file to upload'}
+                            </span>
+                            <span className={styles.uploadSubtext}>
+                                {selectedProducts.length > 0 ? 'JazzCash / EasyPaisa / Bank Transfer (Max 5MB)' : 'JPG, PNG, PDF (Max 5MB)'}
+                            </span>
+                        </div>
+                    ) : (
+                        <div className={styles.filePreview}>
+                            <FiPackage size={18} color="#2F8F83" />
+                            <span className={styles.fileName}>{attachment.name}</span>
+                            <button type="button" className={styles.deleteVoice} onClick={() => setAttachment(null)}>
+                                <FiTrash2 size={16} />
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Live Voice Note (WhatsApp Style) */}

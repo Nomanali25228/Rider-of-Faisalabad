@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle, FiTrash2 } from 'react-icons/fi';
+import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle, FiTrash2, FiImage } from 'react-icons/fi';
 import styles from './AdminOrderTable.module.css';
 
 const STATUS_OPTIONS = ['Pending', 'Accepted', 'In Progress', 'Delivered'];
@@ -110,7 +110,14 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     transition={{ delay: i * 0.05 }}
                                 >
                                     <td>
-                                        <code className={styles.trackCode}>{order.trackingId}</code>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <code className={styles.trackCode}>{order.trackingId}</code>
+                                            {(order.paymentScreenshot || order.attachmentUrl) && (
+                                                <div className={styles.paymentStatusDot} title="Payment Received">
+                                                    <div className={styles.dotPulse} />
+                                                </div>
+                                            )}
+                                        </div>
                                     </td>
                                     <td>
                                         <div className={styles.customerCell}>
@@ -264,6 +271,42 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     <audio controls src={selected.voiceNoteUrl} style={{ width: '100%', height: '36px' }}>
                                         Your browser does not support audio.
                                     </audio>
+                                </div>
+                            </div>
+                        )}
+                        {selected.productDetails && (
+                            <div className={`${styles.detailItem} ${styles.detailFull}`}>
+                                <span className={styles.detailLabel}>Shop Items</span>
+                                <div className={styles.premiumItemsList}>
+                                    {(() => {
+                                        try {
+                                            const items = JSON.parse(selected.productDetails);
+                                            const itemsArray = Array.isArray(items) ? items : [items];
+                                            return itemsArray.map((item, idx) => (
+                                                <div key={idx} className={styles.premiumItem}>
+                                                    <img src={item.image} alt={item.label} className={styles.premiumItemThumb} />
+                                                    <div className={styles.premiumItemInfo}>
+                                                        <strong>{item.label}</strong>
+                                                        <span>RS. {item.price}</span>
+                                                    </div>
+                                                </div>
+                                            ));
+                                        } catch (e) { return <span>Error loading items</span>; }
+                                    })()}
+                                </div>
+                            </div>
+                        )}
+                        {(selected.paymentScreenshot || selected.attachmentUrl) && (
+                            <div className={`${styles.detailItem} ${styles.detailFull}`}>
+                                <span className={styles.detailLabel}>
+                                    <FiImage size={12} /> {selected.attachmentUrl ? 'Initial Attachment / Screenshot' : 'Payment Confirmation'}
+                                </span>
+                                <div className={styles.screenshotPreview}>
+                                    <p className={styles.screenshotHint}>Verification Screenshot:</p>
+                                    <a href={selected.paymentScreenshot || selected.attachmentUrl} target="_blank" rel="noopener noreferrer" className={styles.screenshotLink}>
+                                        <img src={selected.paymentScreenshot || selected.attachmentUrl} alt="Payment" className={styles.paymentImage} />
+                                        <div className={styles.imgOverlay}>Click to View Full Size</div>
+                                    </a>
                                 </div>
                             </div>
                         )}

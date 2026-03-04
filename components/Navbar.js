@@ -10,7 +10,7 @@ const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/services', label: 'Services' },
-    { href: '/gallery', label: 'Gallery' },
+    { href: '/gallery', label: 'Our Shop' },
     { href: '/track-order', label: 'Track Order' },
     { href: '/contact', label: 'Contact' },
 ];
@@ -44,6 +44,33 @@ export default function Navbar() {
 
     return (
         <>
+            {/* Announcement Bar */}
+            <div className={styles.announcementBar}>
+                <div
+                    className={styles.marqueeContainer}
+                >
+                    <div className={styles.marqueeContent}>
+                        <div className={styles.marqueeItem}>
+                            <span>🎉 EID SPECIAL OFFER: 50% DISCOUNT ON ALL SERVICES!</span>
+                            <span className={styles.separator}>★</span>
+                            <span>FASTEST DELIVERY IN FAISALABAD</span>
+                            <span className={styles.separator}>★</span>
+                            <span>BOOK YOUR RIDE NOW AND SAVE BIG</span>
+                            <span className={styles.separator}>★</span>
+                        </div>
+                        {/* Duplicate for seamless loop */}
+                        <div className={styles.marqueeItem}>
+                            <span>🎉 EID SPECIAL OFFER: 50% DISCOUNT ON ALL SERVICES!</span>
+                            <span className={styles.separator}>★</span>
+                            <span>FASTEST DELIVERY IN FAISALABAD</span>
+                            <span className={styles.separator}>★</span>
+                            <span>BOOK YOUR RIDE NOW AND SAVE BIG</span>
+                            <span className={styles.separator}>★</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <nav className={`${styles.navbar} ${scrolled || isLoginPage || isDashboard ? styles.scrolled : ''}`}>
                 <div className={`${styles.inner} container`}>
                     {/* Logo */}

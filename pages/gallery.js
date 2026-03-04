@@ -1,31 +1,37 @@
 import Head from 'next/head';
 import { motion } from 'framer-motion';
-import { FiCamera } from 'react-icons/fi';
+import { FiCamera, FiShoppingCart, FiX, FiCheck, FiPackage } from 'react-icons/fi';
+import { useRouter } from 'next/router';
 import styles from './gallery.module.css';
 
-// Gallery items using emoji+color until real images added
-const galleryItems = [
-    { id: 1, label: 'Fast Delivery', emoji: '⚡', color: '#2F8F83', category: 'Delivery' },
-    { id: 2, label: 'Gift Packaging', emoji: '🎁', color: '#e879a0', category: 'Gift' },
-    { id: 3, label: 'Punjab Routes', emoji: '🗺️', color: '#0ea5e9', category: 'Routes' },
-    { id: 4, label: 'Rider Waqas', emoji: '🏍️', color: '#F4C542', category: 'Team' },
-    { id: 5, label: 'Happy Customer', emoji: '😊', color: '#059669', category: 'Reviews' },
-    { id: 6, label: 'Same Day', emoji: '🚀', color: '#7c3aed', category: 'Delivery' },
-    { id: 7, label: 'Secure Parcel', emoji: '🔒', color: '#2F8F83', category: 'Delivery' },
-    { id: 8, label: 'Event Delivery', emoji: '🎉', color: '#d97706', category: 'Gift' },
-    { id: 9, label: 'International', emoji: '🌍', color: '#0ea5e9', category: 'Routes' },
-    { id: 10, label: 'Rider Saad', image: '/uploads/raider%20saad%20.jpeg', emoji: '🏆', color: '#2F8F83', category: 'Team' },
-    { id: 11, label: 'Medical Parcel', emoji: '💊', color: '#dc2626', category: 'Delivery' },
-    { id: 12, label: 'Team Effort', emoji: '🤝', color: '#F4C542', category: 'Team' },
-];
+import { galleryItems } from '../lib/products';
 
-const categories = ['All', 'Delivery', 'Gift', 'Routes', 'Team', 'Reviews'];
+const categories = ['All', 'Cake', 'Bouquet', 'Acrylic Box', 'Custom Basket'];
 
 import { useState } from 'react';
 
 export default function GalleryPage() {
+    const router = useRouter();
     const [activeCategory, setActiveCategory] = useState('All');
     const [selected, setSelected] = useState(null);
+
+    const handleOrderNow = (item) => {
+        const existing = localStorage.getItem('selectedProducts');
+        let products = [];
+        try {
+            products = existing ? JSON.parse(existing) : [];
+            if (!Array.isArray(products)) products = [];
+        } catch (e) { products = []; }
+
+        // Add the new item
+        products.push(item);
+        localStorage.setItem('selectedProducts', JSON.stringify(products));
+
+        // Also clear the old single product key just in case
+        localStorage.removeItem('selectedProduct');
+
+        router.push('/#quick-order');
+    };
 
     const filtered = activeCategory === 'All'
         ? galleryItems
@@ -34,8 +40,8 @@ export default function GalleryPage() {
     return (
         <>
             <Head>
-                <title>Gallery — Rider of Faisalabad | Delivery Photos & Team</title>
-                <meta name="description" content="View the Rider of Faisalabad gallery — delivery photos, team riders, gift handling, and happy customers from Faisalabad to all Pakistan." />
+                <title>Our Shop — Rider of Faisalabad | Order Cakes, Bouquets & Gifts</title>
+                <meta name="description" content="Browse our shop for the best cakes, flower bouquets, and custom gift baskets in Faisalabad. Fast delivery across Pakistan." />
                 <link rel="canonical" href="https://riderofaisalabad.com/gallery" />
             </Head>
 
@@ -43,9 +49,9 @@ export default function GalleryPage() {
                 <section className={styles.pageHero}>
                     <div className="container">
                         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-                            <span className="section-badge"><FiCamera size={12} /> Gallery</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>Our Work in <span style={{ color: '#F4C542' }}>Pictures</span></h1>
-                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>Photos from our deliveries, team, and happy customers.</p>
+                            <span className="section-badge"><FiCamera size={12} /> Our Shop</span>
+                            <h1 className="section-title" style={{ color: 'white' }}>Browse Our <span style={{ color: '#F4C542' }}>Products</span></h1>
+                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>Choose from our premium selection of cakes, bouquets, and custom gifts. Fast delivery in Faisalabad.</p>
                         </motion.div>
                     </div>
                     <div className={styles.heroShape} />
@@ -68,25 +74,37 @@ export default function GalleryPage() {
 
                         {/* Grid */}
                         <motion.div className={styles.grid} layout>
-                            {filtered.map(({ id, label, emoji, color, image }, i) => (
+                            {filtered.map((item, i) => (
                                 <motion.div
-                                    key={id}
+                                    key={item.id}
                                     className={styles.card}
-                                    style={{ '--g-color': color }}
+                                    style={{ '--g-color': item.color }}
                                     layout
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: i * 0.05, duration: 0.4 }}
-                                    onClick={() => setSelected({ id, label, emoji, color })}
-                                    whileHover={{ scale: 1.03 }}
+                                    onClick={() => setSelected(item)}
+                                    whileHover={{ y: -5 }}
                                 >
                                     <div className={styles.cardInner}>
-                                        {image ? (
-                                            <img src={image} alt={label} className={styles.cardImage} />
-                                        ) : (
-                                            <span className={styles.cardEmoji}>{emoji}</span>
-                                        )}
-                                        <span className={styles.cardLabel}>{label}</span>
+                                        <div className={styles.imageWrapper}>
+                                            <img src={item.image} alt={item.label} className={styles.cardImage} />
+                                        </div>
+                                        <div className={styles.cardFooter}>
+                                            <span className={styles.cardLabel}>{item.label}</span>
+                                            <div className={styles.cardPriceRow}>
+                                                <span className={styles.cardPrice}>RS. {item.price}</span>
+                                                <button
+                                                    className={styles.orderBtn}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleOrderNow(item);
+                                                    }}
+                                                >
+                                                    Order Now
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </motion.div>
                             ))}
@@ -100,23 +118,58 @@ export default function GalleryPage() {
                         className={styles.lightbox}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={() => setSelected(null)}
                     >
                         <motion.div
                             className={styles.lightboxCard}
-                            style={{ '--g-color': selected.color }}
-                            initial={{ scale: 0.8 }}
-                            animate={{ scale: 1 }}
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
                             onClick={e => e.stopPropagation()}
                         >
-                            {selected.image ? (
-                                <img src={selected.image} alt={selected.label} className={styles.lightboxImage} />
-                            ) : (
-                                <span className={styles.lightboxEmoji}>{selected.emoji}</span>
-                            )}
-                            <h3>{selected.label}</h3>
-                            <p style={{ color: '#888', marginTop: 8 }}>Rider of Faisalabad</p>
-                            <button className={styles.closeBtn} onClick={() => setSelected(null)}>Close</button>
+                            <button className={styles.topCloseBtn} onClick={() => setSelected(null)}>
+                                <FiX size={24} />
+                            </button>
+
+                            <div className={styles.lightboxContent}>
+                                <div className={styles.lightboxLeft}>
+                                    <img src={selected.image} alt={selected.label} className={styles.lightboxImage} />
+                                </div>
+                                <div className={styles.lightboxRight}>
+                                    <div className={styles.lightboxHeader}>
+                                        <span className={styles.categoryBadge}>{selected.category}</span>
+                                        <h3>{selected.label}</h3>
+                                        <div className={styles.lightboxPrice}>RS. {selected.price}</div>
+                                    </div>
+
+                                    <div className={styles.productFeatures}>
+                                        <div className={styles.feature}>
+                                            <FiCheck className={styles.featureIcon} />
+                                            <span>Same day delivery available</span>
+                                        </div>
+                                        <div className={styles.feature}>
+                                            <FiCheck className={styles.featureIcon} />
+                                            <span>Premium Quality Assurance</span>
+                                        </div>
+                                    </div>
+
+                                    <p className={styles.lightboxDesc}>
+                                        {selected.description}
+                                    </p>
+
+                                    <div className={styles.lightboxActions}>
+                                        <button
+                                            className={`${styles.mainOrderBtn}`}
+                                            onClick={() => handleOrderNow(selected)}
+                                        >
+                                            <FiPackage size={18} /> Order This Now
+                                        </button>
+                                        <button className={styles.secondaryBtn} onClick={() => setSelected(null)}>
+                                            Continue Shopping
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </motion.div>
                     </motion.div>
                 )}

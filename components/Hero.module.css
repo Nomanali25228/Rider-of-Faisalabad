@@ -5,7 +5,8 @@
     align-items: center;
     background: linear-gradient(150deg, #0d3530 0%, #1a5c55 45%, #2F8F83 100%);
     overflow: hidden;
-    padding-top: 72px;
+    padding-top: 112px;
+    /* 40px (Announcement) + 72px (Navbar) */
 }
 
 /* Background Shapes */
@@ -318,7 +319,8 @@
 @media (max-width: 992px) {
     .hero {
         min-height: auto;
-        padding-top: 100px;
+        padding-top: 140px;
+        /* Adjusted for announcement bar */
         padding-bottom: 30px;
     }
 
@@ -428,7 +430,8 @@
 
 @media (max-width: 480px) {
     .hero {
-        padding-top: 80px;
+        padding-top: 120px;
+        /* Adjusted for announcement bar */
         padding-bottom: 20px;
     }
 
