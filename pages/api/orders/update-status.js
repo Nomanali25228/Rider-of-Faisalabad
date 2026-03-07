@@ -102,6 +102,9 @@ async function sendAcceptedEmail(order) {
                 </div>
 
                 <p>Thank you for choosing Rider of Faisalabad!</p>
+                <div style="margin-top:20px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+                    <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Need help?</strong> If you have any questions or face any issues, feel free to contact us at <strong style="color:#2F8F83;">0306-9810032</strong>. We're always here to assist you!</p>
+                </div>
                 <p style="font-size:12px; color:#888;">If you've already paid, please ignore this email or visit the tracking link to check status.</p>
             </div>
         `,
@@ -124,6 +127,9 @@ async function sendRejectedEmail(order, reason) {
                     <p style="margin:0; font-style:italic;">"${reason || 'Service temporarily unavailable'}"</p>
                 </div>
                 <p>You can contact our support if you have any questions.</p>
+                <div style="margin-top:20px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+                    <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Need assistance?</strong> Please call or WhatsApp us at <strong style="color:#2F8F83;">0306-9810032</strong> and we'll do our best to help resolve this for you.</p>
+                </div>
                 <p>Thank you for your understanding.</p>
             </div>
         `,
@@ -151,6 +157,9 @@ async function sendDeliveredEmail(order) {
                 </div>
                 <br/>
                 <p>Thank you for choosing Rider of Faisalabad!</p>
+                <div style="margin-top:15px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+                    <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Any concerns?</strong> If you faced any issue with your delivery or need further assistance, contact us at <strong style="color:#2F8F83;">0306-9810032</strong>. Your satisfaction matters to us!</p>
+                </div>
             </div>
         `,
     });

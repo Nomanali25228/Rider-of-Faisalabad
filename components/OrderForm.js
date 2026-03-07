@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare, FiCopy } from 'react-icons/fi';
+import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare, FiCopy, FiCalendar } from 'react-icons/fi';
 import styles from './OrderForm.module.css';
 import dynamic from 'next/dynamic';
 
@@ -20,6 +20,7 @@ const initialState = {
     dropAddress: '',
     parcelType: '',
     deliveryType: 'Normal',
+    deliveryDate: '',
     message: '',
     voiceNote: null,
 };
@@ -193,15 +194,14 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
         if (!form.fullName.trim()) newErrors.fullName = '👤 Please enter your full name.';
         if (!form.phone.trim()) newErrors.phone = '📞 Please enter your phone number.';
         else if (!/^[0-9+\s()-]{7,15}$/.test(form.phone.trim())) newErrors.phone = '📞 Please enter a valid phone number.';
-        if (!form.pickupAddress.trim()) newErrors.pickupAddress = '📍 Please enter the pickup address.';
+        if (selectedProducts.length === 0 && !form.pickupAddress.trim()) newErrors.pickupAddress = '📍 Please enter the pickup address.';
         if (!form.dropAddress.trim()) newErrors.dropAddress = '📍 Please enter the drop/delivery address.';
-        if (!form.parcelType) newErrors.parcelType = '📦 Please select a parcel type.';
-
-        // New: Enforce payment screenshot if shop items are present
-        if (selectedProducts.length > 0 && !attachment) {
-            newErrors.attachment = '💳 Please attach your payment screenshot to proceed with shop items.';
-            toast.error('Payment screenshot is required for shop items.');
+        if (selectedProducts.length === 0 && !form.parcelType) newErrors.parcelType = '📦 Please select a parcel type.';
+        if (form.deliveryType === 'Normal' && !form.deliveryDate) {
+            newErrors.deliveryDate = '📅 Please select a preferred delivery date.';
         }
+
+
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -372,34 +372,36 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                 </div>
 
                 {/* Pickup Address */}
-                <div className="form-group">
-                    <label className="form-label" htmlFor="pickupAddress">
-                        <FiMapPin size={14} /> Pickup Address <span className={styles.req}>*</span>
-                    </label>
-                    <div className={styles.inputWithAction}>
-                        <input
-                            id="pickupAddress"
-                            name="pickupAddress"
-                            type="text"
-                            className={`form-input ${errors.pickupAddress ? styles.inputError : ''}`}
-                            placeholder="Pickup location"
-                            value={form.pickupAddress}
-                            onChange={handleChange}
-                        />
-                        <button
-                            type="button"
-                            className={styles.mapBtn}
-                            onClick={() => setMapMode('pickup')}
-                            title="Select on Map"
-                        >
-                            <FiMap size={18} />
-                        </button>
+                {selectedProducts.length === 0 && (
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="pickupAddress">
+                            <FiMapPin size={14} /> Pickup Address <span className={styles.req}>*</span>
+                        </label>
+                        <div className={styles.inputWithAction}>
+                            <input
+                                id="pickupAddress"
+                                name="pickupAddress"
+                                type="text"
+                                className={`form-input ${errors.pickupAddress ? styles.inputError : ''}`}
+                                placeholder="Pickup location"
+                                value={form.pickupAddress}
+                                onChange={handleChange}
+                            />
+                            <button
+                                type="button"
+                                className={styles.mapBtn}
+                                onClick={() => setMapMode('pickup')}
+                                title="Select on Map"
+                            >
+                                <FiMap size={18} />
+                            </button>
+                        </div>
+                        {errors.pickupAddress && <span className={styles.errorMsg}>{errors.pickupAddress}</span>}
                     </div>
-                    {errors.pickupAddress && <span className={styles.errorMsg}>{errors.pickupAddress}</span>}
-                </div>
+                )}
 
                 {/* Drop Address */}
-                <div className="form-group">
+                <div className={`form-group ${selectedProducts.length > 0 ? styles.fullWidth : ''}`}>
                     <label className="form-label" htmlFor="dropAddress">
                         <FiMapPin size={14} /> Drop Address <span className={styles.req}>*</span>
                     </label>
@@ -426,31 +428,33 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                 </div>
 
                 {/* Parcel Type */}
-                <div className="form-group">
-                    <label className="form-label" htmlFor="parcelType">
-                        <FiPackage size={14} /> Parcel Type <span className={styles.req}>*</span>
-                    </label>
-                    <select
-                        id="parcelType"
-                        name="parcelType"
-                        className={`form-input ${errors.parcelType ? styles.inputError : ''}`}
-                        value={form.parcelType}
-                        onChange={handleChange}
-                    >
-                        <option value="" disabled>Select type...</option>
-                        <option value="Documents">Documents</option>
-                        <option value="Clothes">Clothes</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Food">Food</option>
-                        <option value="Gift">Gift</option>
-                        <option value="Cake">Cake</option>
-                        <option value="Bouquet">Bouquet</option>
-                        <option value="Custom Basket">Custom Basket</option>
-                        <option value="Medicine">Medicine</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    {errors.parcelType && <span className={styles.errorMsg}>{errors.parcelType}</span>}
-                </div>
+                {selectedProducts.length === 0 && (
+                    <div className="form-group">
+                        <label className="form-label" htmlFor="parcelType">
+                            <FiPackage size={14} /> Parcel Type <span className={styles.req}>*</span>
+                        </label>
+                        <select
+                            id="parcelType"
+                            name="parcelType"
+                            className={`form-input ${errors.parcelType ? styles.inputError : ''}`}
+                            value={form.parcelType}
+                            onChange={handleChange}
+                        >
+                            <option value="" disabled>Select type...</option>
+                            <option value="Documents">Documents</option>
+                            <option value="Clothes">Clothes</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Food">Food</option>
+                            <option value="Gift">Gift</option>
+                            <option value="Cake">Cake</option>
+                            <option value="Bouquet">Bouquet</option>
+                            <option value="Custom Basket">Custom Basket</option>
+                            <option value="Medicine">Medicine</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        {errors.parcelType && <span className={styles.errorMsg}>{errors.parcelType}</span>}
+                    </div>
+                )}
 
                 {/* Delivery Type */}
                 <div className={`form-group ${styles.fullWidth}`}>
@@ -477,6 +481,31 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                         {form.deliveryType === 'Same Day' && '📅 Guaranteed delivery on the same day the order is placed.'}
                         {form.deliveryType === 'Normal' && '📦 Standard delivery within 24 to 48 hours.'}
                     </motion.div>
+
+                    <AnimatePresence>
+                        {form.deliveryType === 'Normal' && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                className={styles.datePickerSection}
+                            >
+                                <label className="form-label" htmlFor="deliveryDate">
+                                    <FiCalendar size={14} /> Preferred Delivery Date <span className={styles.req}>*</span>
+                                </label>
+                                <input
+                                    id="deliveryDate"
+                                    name="deliveryDate"
+                                    type="date"
+                                    className={`form-input ${errors.deliveryDate ? styles.inputError : ''}`}
+                                    min={new Date().toLocaleDateString('en-CA')}
+                                    value={form.deliveryDate}
+                                    onChange={handleChange}
+                                />
+                                {errors.deliveryDate && <span className={styles.errorMsg}>{errors.deliveryDate}</span>}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 {/* Message */}
@@ -498,11 +527,7 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                 {/* Attachment Upload */}
                 <div className={`form-group ${styles.fullWidth}`} id="attachment">
                     <label className="form-label">
-                        {selectedProducts.length > 0 ? (
-                            <><span style={{ color: '#dc2626' }}>💳 Payment Screenshot (REQUIRED)</span></>
-                        ) : (
-                            <><FiUpload size={14} /> Upload Screenshot/Files (Optional)</>
-                        )}
+                        <FiUpload size={14} /> Upload Screenshot/Files (Optional)
                     </label>
                     <input
                         type="file"
@@ -513,7 +538,7 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                     />
                     {!attachment ? (
                         <div
-                            className={`${styles.uploadZone} ${selectedProducts.length > 0 ? styles.requiredZone : ''}`}
+                            className={styles.uploadZone}
                             onClick={() => fileInputRef.current?.click()}
                         >
                             <FiUpload size={24} className={styles.uploadIcon} />

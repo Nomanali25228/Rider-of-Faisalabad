@@ -20,6 +20,20 @@
     line-height: 1.7;
 }
 
+.heroTitle {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    font-family: 'Outfit', sans-serif;
+}
+
+.heroTitle span {
+    color: #F4C542;
+}
+
 .heroShape {
     position: absolute;
     bottom: 0;
@@ -284,11 +298,26 @@
 
 @media (max-width: 640px) {
     .hero {
-        padding: 80px 0 110px;
+        padding: 120px 0 100px;
+        text-align: center;
+    }
+
+    .heroText {
+        margin: 0 auto;
+    }
+
+    .heroTitle {
+        font-size: 26px;
     }
 
     .heroSub {
-        font-size: 15px;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 0 10px;
+    }
+
+    .heroShape {
+        height: 60px;
     }
 
     .formCard {

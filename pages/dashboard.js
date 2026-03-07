@@ -22,6 +22,7 @@ export default function DashboardPage() {
     const [contacts, setContacts] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
     const [filter, setFilter] = useState('all');
     const [view, setView] = useState('orders'); // 'orders', 'contacts', or 'reviews'
     const [page, setPage] = useState(1);
@@ -105,6 +106,7 @@ export default function DashboardPage() {
 
     const handleStatusChange = async (orderId, newStatus, rejectionReason) => {
         const token = localStorage.getItem('admin_token');
+        setActionLoading(true);
         try {
             const res = await fetch('/api/orders/update-status', {
                 method: 'POST',
@@ -126,12 +128,15 @@ export default function DashboardPage() {
         } catch (err) {
             toast.error('Failed to update status.');
             return false;
+        } finally {
+            setActionLoading(false);
         }
     };
 
     const handleDelete = async (type, id) => {
         const token = localStorage.getItem('admin_token');
         const endpoint = `/api/${type}/delete`;
+        setActionLoading(true);
         try {
             const res = await fetch(endpoint, {
                 method: 'POST',
@@ -150,6 +155,8 @@ export default function DashboardPage() {
             }
         } catch (err) {
             toast.error('Error deleting item');
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -169,6 +176,13 @@ export default function DashboardPage() {
             </Head>
 
             <div className={styles.dashboard}>
+                {/* Global Action Loading Bar */}
+                {actionLoading && (
+                    <div className={styles.actionLoadingBar}>
+                        <div className={styles.actionLoadingProgress} />
+                    </div>
+                )}
+
                 {/* Dashboard Header */}
                 <header className={styles.dbHeader}>
                     <div className={styles.dbHeaderLeft}>

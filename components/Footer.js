@@ -162,7 +162,7 @@ export default function Footer({ isAdmin }) {
                                 </li>
                                 <li>
                                     <FiPhone size={16} className={styles.contactIcon} />
-                                    <a href="tel:+923027201810">+92 302 7201810</a>
+                                    <a href="https://wa.me/923069810032" target="_blank" rel="noopener noreferrer">0306 9810032</a>
                                 </li>
                                 <li>
                                     <FiMail size={16} className={styles.contactIcon} />
@@ -183,7 +183,7 @@ export default function Footer({ isAdmin }) {
                 <div className="container">
                     <div className={styles.bottomInner}>
                         <p className={styles.copyright}>
-                            &copy; 2021 Rider of Faisalabad. All rights reserved.
+                            &copy; 2026 Rider of Faisalabad. All rights reserved.
                         </p>
                     </div>
                 </div>

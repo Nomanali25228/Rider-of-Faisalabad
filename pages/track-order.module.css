@@ -8,6 +8,28 @@
 
 .heroContent {
     max-width: 640px;
+    position: relative;
+    z-index: 2;
+}
+
+.heroTitle {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    font-family: 'Outfit', sans-serif;
+}
+
+.heroTitle span {
+    color: #F4C542;
+}
+
+.heroDesc {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 /* jskjskjksjkkjsj */
@@ -768,16 +790,27 @@
 
 @media (max-width: 640px) {
     .pageHero {
-        padding: 100px 0 80px;
-        /* Adjusted for announcement bar */
+        padding: 120px 0 90px;
+        text-align: center;
     }
 
-    .heroContent h1 {
-        font-size: 28px !important;
+    .heroContent {
+        margin: 0 auto;
     }
 
-    .heroContent p {
-        font-size: 14px !important;
+    .heroTitle {
+        font-size: 26px;
+        margin-bottom: 12px;
+    }
+
+    .heroDesc {
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 0 10px;
+    }
+
+    .heroShape {
+        height: 60px;
     }
 
     .orderDetails {

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiClock, FiCheckCircle, FiPackage, FiMapPin, FiTruck, FiAlertCircle, FiStar, FiXCircle, FiUpload, FiTrash2, FiFileText, FiCopy, FiSmartphone } from 'react-icons/fi';
@@ -35,10 +35,60 @@ export default function TrackOrderPage() {
     const [uploading, setUploading] = useState(false);
     const [uploaded, setUploaded] = useState(false);
 
+    // Auto-polling refs
+    const pollingRef = useRef(null);
+    const activeTrackingId = useRef('');
+    const lastStatus = useRef('');
+
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
         toast.success('Number copied!');
     };
+
+    // Silent poll to fetch latest order status without resetting UI
+    const silentPoll = async () => {
+        const tid = activeTrackingId.current;
+        if (!tid) return;
+        try {
+            const res = await fetch(`/api/orders/track?id=${tid.trim()}`);
+            const data = await res.json();
+            if (data.success && data.order) {
+                // Check if status changed
+                if (lastStatus.current && data.order.status !== lastStatus.current) {
+                    toast.success(`Order status updated: ${data.order.status}`, { icon: '🔄' });
+                }
+                lastStatus.current = data.order.status;
+                setOrder(data.order);
+            }
+        } catch {
+            // Silently ignore polling errors
+        }
+    };
+
+    // Start polling when order is loaded
+    useEffect(() => {
+        if (order && order.trackingId) {
+            activeTrackingId.current = order.trackingId;
+            lastStatus.current = order.status;
+
+            // Clear any existing interval
+            if (pollingRef.current) clearInterval(pollingRef.current);
+
+            // Poll every 8 seconds
+            pollingRef.current = setInterval(silentPoll, 8000);
+        }
+
+        return () => {
+            if (pollingRef.current) clearInterval(pollingRef.current);
+        };
+    }, [order?.trackingId]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (pollingRef.current) clearInterval(pollingRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         if (id) {
@@ -52,6 +102,8 @@ export default function TrackOrderPage() {
         setError('');
         setOrder(null);
         setReviewSubmitted(false);
+        activeTrackingId.current = '';
+        if (pollingRef.current) clearInterval(pollingRef.current);
         try {
             const res = await fetch(`/api/orders/track?id=${tid.trim()}`);
             const data = await res.json();
@@ -150,10 +202,10 @@ export default function TrackOrderPage() {
                             transition={{ duration: 0.7 }}
                         >
                             <span className="section-badge"><FiPackage size={12} /> Track Order</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>
-                                Track Your <span style={{ color: '#F4C542' }}>Parcel</span>
+                            <h1 className={styles.heroTitle}>
+                                Track Your <span>Parcel</span>
                             </h1>
-                            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 16 }}>
+                            <p className={styles.heroDesc}>
                                 Enter your tracking ID to get live status of your delivery.
                             </p>
 

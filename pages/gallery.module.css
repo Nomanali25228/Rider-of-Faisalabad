@@ -27,6 +27,32 @@
     clip-path: ellipse(60% 100% at 50% 100%);
 }
 
+.heroContent {
+    max-width: 650px;
+    position: relative;
+    z-index: 2;
+}
+
+.heroTitle {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.heroTitle span {
+    color: var(--accent);
+}
+
+.heroDesc {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
 .filterRow {
     display: flex;
     flex-wrap: wrap;
@@ -369,7 +395,43 @@
 
 @media (max-width: 640px) {
     .pageHero {
-        padding: 100px 0 60px;
+        padding: 120px 0 100px;
+        /* Increased bottom padding */
+        text-align: center;
+    }
+
+    .heroShape {
+        height: 60px;
+        /* Slightly shorter curve on mobile */
+    }
+
+    .heroContent {
+        margin: 0 auto;
+        padding: 0 10px;
+    }
+
+    .heroTitle {
+        font-size: 26px;
+        /* Slightly smaller for better fit */
+        margin-bottom: 12px;
+    }
+
+    .heroDesc {
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 20px;
+        /* Added margin to push away from curve */
+    }
+
+    .filterRow {
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .filterBtn {
+        padding: 6px 16px;
+        font-size: 13px;
     }
 
     .grid {

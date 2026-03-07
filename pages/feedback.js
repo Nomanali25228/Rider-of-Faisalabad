@@ -92,8 +92,8 @@ export default function FeedbackPage() {
                             transition={{ duration: 0.6 }}
                         >
                             <span className="section-badge"><FiStar size={12} /> Feedback</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>
-                                Your <span style={{ color: '#F4C542' }}>Opinion</span> Matters
+                            <h1 className={styles.heroTitle}>
+                                Your <span>Opinion</span> Matters
                             </h1>
                             <p className={styles.heroSub}>
                                 Did we deliver on time? Was our rider professional? Help us improve by sharing your thoughts — your review will appear on our homepage!

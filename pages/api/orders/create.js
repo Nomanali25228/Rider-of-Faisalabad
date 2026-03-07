@@ -35,6 +35,7 @@ export default async function handler(req, res) {
             dropAddress: getField('dropAddress'),
             parcelType: getField('parcelType'),
             deliveryType: getField('deliveryType'),
+            deliveryDate: getField('deliveryDate'),
             message: getField('message'),
             productDetails: getField('productDetails'), // JSON string
         };
@@ -153,6 +154,7 @@ async function sendOrderEmails(order, products) {
                     <p><strong>Pickup:</strong> ${order.pickupAddress}</p>
                     <p><strong>Drop-off:</strong> ${order.dropAddress}</p>
                     <p><strong>Parcel:</strong> ${order.parcelType} (${order.deliveryType})</p>
+                    ${order.deliveryDate ? `<p><strong>Delivery Date:</strong> ${order.deliveryDate}</p>` : ''}
                     ${productHtml}
                     <p><strong>Instructions:</strong> ${order.message || 'N/A'}</p>
                     ${attachmentsHtml}
@@ -177,6 +179,9 @@ async function sendOrderEmails(order, products) {
                     </div>
                     ${productHtml}
                     <p>Keep this ID to track your order on our website.</p>
+                    <div style="margin-top:20px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+                        <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Need help?</strong> If you have any questions, concerns, or face any issues with your order, feel free to contact us directly at <strong style="color:#2F8F83;">0306-9810032</strong>. We're here to help!</p>
+                    </div>
                     <br/>
                     <p>Best Regards,<br/><strong>Rider of Faisalabad Team</strong></p>
                 </div>

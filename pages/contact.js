@@ -177,10 +177,10 @@ export default function ContactPage() {
             <div className="page-wrapper">
                 <section className={styles.pageHero}>
                     <div className="container">
-                        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+                        <motion.div className={styles.heroContent} initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
                             <span className="section-badge"><FiPhone size={12} /> Contact Us</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>Get In <span style={{ color: '#F4C542' }}>Touch</span></h1>
-                            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 16 }}>We respond within 6 hours. Ready to serve you!</p>
+                            <h1 className={styles.heroTitle}>Get In <span>Touch</span></h1>
+                            <p className={styles.heroDesc}>We respond within 6 hours. Ready to serve you!</p>
                         </motion.div>
                     </div>
                     <div className={styles.heroShape} />

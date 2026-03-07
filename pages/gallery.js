@@ -48,10 +48,15 @@ export default function GalleryPage() {
             <div className="page-wrapper">
                 <section className={styles.pageHero}>
                     <div className="container">
-                        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7 }}
+                            className={styles.heroContent}
+                        >
                             <span className="section-badge"><FiCamera size={12} /> Our Shop</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>Browse Our <span style={{ color: '#F4C542' }}>Products</span></h1>
-                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 16 }}>Choose from our premium selection of cakes, bouquets, and custom gifts. Fast delivery in Faisalabad.</p>
+                            <h1 className={styles.heroTitle}>Browse Our <span>Products</span></h1>
+                            <p className={styles.heroDesc}>Choose from our premium selection of cakes, bouquets, and custom gifts. Fast delivery in Faisalabad.</p>
                         </motion.div>
                     </div>
                     <div className={styles.heroShape} />

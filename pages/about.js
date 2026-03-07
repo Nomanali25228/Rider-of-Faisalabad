@@ -49,8 +49,8 @@ export default function AboutPage() {
                             animate="visible"
                         >
                             <span className="section-badge"><MdDeliveryDining size={14} /> Our Story</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>About <span style={{ color: '#F4C542' }}>Rider of Faisalabad</span></h1>
-                            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 17, maxWidth: 560, lineHeight: 1.7 }}>
+                            <h1 className={styles.heroTitle}>About <span>Rider of Faisalabad</span></h1>
+                            <p className={styles.heroDesc}>
                                 Born in the heart of Faisalabad, we have grown from a single rider to a trusted delivery network serving all of Pakistan and beyond.
                             </p>
                         </motion.div>

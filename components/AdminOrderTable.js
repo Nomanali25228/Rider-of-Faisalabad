@@ -251,6 +251,12 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                             <span className={styles.detailLabel}>Parcel</span>
                             <span>{selected.parcelType}</span>
                         </div>
+                        {selected.deliveryDate && (
+                            <div className={styles.detailItem}>
+                                <span className={styles.detailLabel}>Target Date</span>
+                                <strong style={{ color: '#2F8F83' }}>{selected.deliveryDate}</strong>
+                            </div>
+                        )}
                         <div className={`${styles.detailItem} ${styles.detailFull}`}>
                             <span className={styles.detailLabel}><FiMapPin size={12} /> Pickup</span>
                             <span>{selected.pickupAddress}</span>

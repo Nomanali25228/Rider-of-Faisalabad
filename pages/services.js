@@ -94,10 +94,10 @@ export default function ServicesPage() {
                             transition={{ duration: 0.8 }}
                         >
                             <span className="section-badge"><FiPackage size={12} /> Our Services</span>
-                            <h1 className="section-title" style={{ color: 'white' }}>
-                                Complete Delivery <span style={{ color: '#F4C542' }}>Solutions</span>
+                            <h1 className={styles.heroTitle}>
+                                Complete Delivery <span>Solutions</span>
                             </h1>
-                            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 17, maxWidth: 540, lineHeight: 1.7 }}>
+                            <p className={styles.heroDesc}>
                                 From urgent same-day delivery to international shipping — we have the right service for every need.
                             </p>
                         </motion.div>

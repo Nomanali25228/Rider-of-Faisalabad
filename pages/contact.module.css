@@ -15,6 +15,32 @@
     clip-path: ellipse(60% 100% at 50% 100%);
 }
 
+.heroContent {
+    max-width: 600px;
+    position: relative;
+    z-index: 2;
+}
+
+.heroTitle {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    font-family: 'Outfit', sans-serif;
+}
+
+.heroTitle span {
+    color: #F4C542;
+}
+
+.heroDesc {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
 .grid {
     display: grid;
     grid-template-columns: 1fr 1.4fr;
@@ -317,12 +343,27 @@ a.infoValue:hover {
 
 @media (max-width: 480px) {
     .pageHero {
-        padding: 80px 0 50px;
+        padding: 110px 0 80px;
         text-align: center;
     }
 
-    .pageHero p {
+    .heroContent {
         margin: 0 auto;
+    }
+
+    .heroTitle {
+        font-size: 26px;
+        margin-bottom: 10px;
+    }
+
+    .heroDesc {
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 0 10px;
+    }
+
+    .heroShape {
+        height: 60px;
     }
 
     .sideTitle {
