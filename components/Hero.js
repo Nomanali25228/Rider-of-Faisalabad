@@ -88,9 +88,9 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7, duration: 0.6 }}
                     >
-                        <Link href="/#quick-order" className="btn btn-primary btn-lg" id="hero-book-btn">
+                        <Link href="/gallery" className="btn btn-primary btn-lg" id="hero-book-btn">
                             <FiPackage size={20} />
-                            Order Now
+                            Shop Now
                         </Link>
                         <Link href="/track-order" className={`btn btn-lg ${styles.trackBtn}`} id="hero-track-btn">
                             <FiSearch size={20} />
