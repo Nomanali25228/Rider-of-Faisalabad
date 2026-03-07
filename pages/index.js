@@ -79,9 +79,11 @@ export default function HomePage() {
             const timer = setTimeout(() => {
                 const element = document.getElementById('quick-order');
                 if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
+                    const yOffset = -100; // navbar offset
+                    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
                 }
-            }, 600); // Small delay to ensure page is rendered
+            }, 600);
             return () => clearTimeout(timer);
         }
     }, [router.asPath]);
@@ -98,11 +100,22 @@ export default function HomePage() {
         localStorage.removeItem('selectedProduct');
         setCartRefresh(v => v + 1);
 
-        // Use standard JS query instead of smooth scroll hook for simplicity
-        const element = document.getElementById('quick-order');
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-        }
+        // Scroll to the order form first, then after render, scroll to the products section
+        setTimeout(() => {
+            const productsSection = document.getElementById('order-products-section');
+            if (productsSection) {
+                const yOffset = -100; // account for sticky navbar
+                const y = productsSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            } else {
+                const element = document.getElementById('quick-order');
+                if (element) {
+                    const yOffset = -80;
+                    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            }
+        }, 300);
     };
 
 

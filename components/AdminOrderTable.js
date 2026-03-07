@@ -32,8 +32,10 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
     useEffect(() => {
         if (selected && detailRef.current) {
             setTimeout(() => {
-                detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+                const yOffset = -80;
+                const y = detailRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }, 150);
         }
     }, [selected]);
 

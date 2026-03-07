@@ -101,7 +101,11 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
     // Auto-scroll to success message
     useEffect(() => {
         if (trackingId && successRef.current) {
-            successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                const yOffset = -120;
+                const y = successRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }, 150);
         }
     }, [trackingId]);
 
@@ -206,7 +210,12 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
             const firstErrorKey = Object.keys(newErrors)[0];
-            document.getElementById(firstErrorKey)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const el = document.getElementById(firstErrorKey);
+            if (el) {
+                const yOffset = -120;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
             return;
         }
         setErrors({});
@@ -277,7 +286,7 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
             {/* Multi-Product Section */}
             <AnimatePresence>
                 {selectedProducts.length > 0 && (
-                    <div className={styles.productsContainer}>
+                    <div className={styles.productsContainer} id="order-products-section">
                         <div className={styles.sectionHeader}>
                             <h4 className={styles.sectionLabel}>📦 Items from Our Shop ({selectedProducts.length})</h4>
                             <button type="button" className={styles.actionBtn} onClick={clearAllProducts} title="Clear all">

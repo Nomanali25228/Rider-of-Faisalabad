@@ -32,7 +32,11 @@ export default function ContactPage() {
     // Auto-scroll to success
     useEffect(() => {
         if (submitted && successRef.current) {
-            successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                const yOffset = -120;
+                const y = successRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }, 150);
         }
     }, [submitted]);
 
