@@ -39,8 +39,8 @@ export default async function handler(req, res) {
         // Cleanup temp file
         try { fs.unlinkSync(paymentFile.filepath); } catch (e) { console.error('Cleanup failed:', e); }
 
-        // Update Order Status to 'In Progress' and save screenshot URL
-        await updateOrderStatus(orderId, 'In Progress', { paymentScreenshot: resultUrl });
+        // Update Order with screenshot URL but KEEP status as Accepted
+        await updateOrderStatus(orderId, 'Accepted', { paymentScreenshot: resultUrl });
 
         // Get detailed order for email
         const order = await getOrderById(orderId);

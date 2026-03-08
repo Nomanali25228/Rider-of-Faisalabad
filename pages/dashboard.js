@@ -31,11 +31,11 @@ export default function DashboardPage() {
     const [isAuth, setIsAuth] = useState(false);
     const router = useRouter();
 
-    const fetchDashboardData = async (p = page, f = filter) => {
+    const fetchDashboardData = async (p = page, f = filter, silent = false) => {
         const token = localStorage.getItem('admin_token');
         if (!token) return;
 
-        setLoading(true);
+        if (!silent) setLoading(true);
         try {
             // Fetch Orders with explicit page and filter
             const ordersRes = await fetch(`/api/orders/list?page=${p}&status=${f}`, {
@@ -64,9 +64,9 @@ export default function DashboardPage() {
                 setReviews(reviewsData.reviews);
             }
         } catch (err) {
-            toast.error('Network error while fetching data.');
+            if (!silent) toast.error('Network error while fetching data.');
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
@@ -79,6 +79,18 @@ export default function DashboardPage() {
             fetchDashboardData(page, filter);
         }
     }, [router, page, filter]);
+
+    // Background polling every 8 seconds
+    useEffect(() => {
+        const token = localStorage.getItem('admin_token');
+        if (!token || !isAuth) return;
+
+        const intervalId = setInterval(() => {
+            fetchDashboardData(page, filter, true);
+        }, 8000);
+
+        return () => clearInterval(intervalId);
+    }, [isAuth, page, filter]);
 
     const stats = {
         total: orderStats.total,
@@ -104,21 +116,22 @@ export default function DashboardPage() {
         fetchDashboardData(1, newFilter); // Explicitly fetch page 1 with new filter
     };
 
-    const handleStatusChange = async (orderId, newStatus, rejectionReason) => {
+    const handleStatusChange = async (orderId, newStatus, extraData = {}) => {
         const token = localStorage.getItem('admin_token');
         setActionLoading(true);
         try {
+            const payload = { orderId, status: newStatus, ...extraData };
             const res = await fetch('/api/orders/update-status', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ orderId, status: newStatus, rejectionReason }),
+                body: JSON.stringify(payload),
             });
             const data = await res.json();
             if (data.success) {
-                setOrders(prev => prev.map(o => (o._id === orderId || o.trackingId === orderId) ? { ...o, status: newStatus, rejectionReason } : o));
+                setOrders(prev => prev.map(o => (o._id === orderId || o.trackingId === orderId) ? { ...o, status: newStatus, ...extraData } : o));
                 toast.success(`Status updated to ${newStatus}`);
                 return true;
             } else {

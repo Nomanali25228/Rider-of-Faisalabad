@@ -18,7 +18,6 @@ const quickLinks = [
 const services = [
     { label: 'Same Day Delivery' },
     { label: 'Gift Delivery' },
-    { label: 'Urgent Delivery' },
     { label: 'Punjab Rider Service' },
     { label: 'Pakistan Courier' },
     { label: 'International Delivery' },

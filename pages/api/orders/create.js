@@ -61,12 +61,22 @@ export default async function handler(req, res) {
             try { fs.unlinkSync(attachmentFile.filepath); } catch (e) { console.error('Cleanup failed:', e); }
         }
 
+        // Calculate initial total price for shop items if any
+        let totalPrice = null;
+        if (parsedProducts.length > 0) {
+            totalPrice = parsedProducts.reduce((acc, p) => {
+                const val = parseInt(p.price.replace(/[^0-9]/g, '')) || 0;
+                return acc + val;
+            }, 0);
+        }
+
         const order = {
             id: orderId,
             trackingId,
             ...orderData,
             voiceNoteUrl,
             attachmentUrl,
+            totalPrice: totalPrice, // Pre-fill if shop items exist
             status: 'Pending',
             createdAt: new Date().toISOString(),
         };
@@ -165,6 +175,34 @@ async function sendOrderEmails(order, products) {
 
     // To Customer
     if (order.email) {
+        const hasPayment = !!order.attachmentUrl;
+        const paymentInfoHtml = order.totalPrice ? `
+            <div style="margin:20px 0; padding:20px; background:#fdfaf0; border:1.2px solid #F4C542; border-radius:12px; text-align:center;">
+                <p style="margin:0 0 10px 0; font-weight:bold; color:#222;">Payment Required</p>
+                <div style="font-size:24px; font-weight:900; color:#2F8F83;">RS. ${order.totalPrice.toLocaleString()}</div>
+                <p style="font-size:13px; color:#666; margin-top:10px;">
+                    ${hasPayment
+                ? '✅ Thank you for uploading the screenshot. We will verify it shortly.'
+                : '⚠️ Please pay the above amount to move your order forward. Upload the screenshot on the tracking page.'}
+                </p>
+                
+                <div style="margin-top:15px; text-align:left; font-size:13px;">
+                    <div style="padding:10px; background:white; border-radius:8px; border:1px solid #eee; margin-bottom:8px;">
+                        <strong>JazzCash/EasyPaisa:</strong> 0302-7201810<br/>
+                        <span style="color:#777;">Title: WAQAS AHMAD</span>
+                    </div>
+                    <div style="padding:10px; background:white; border-radius:8px; border:1px solid #eee;">
+                        <strong>HBL Bank:</strong> 14667905719303<br/>
+                        <span style="color:#777;">Title: WAQAS AHMAD</span>
+                    </div>
+                </div>
+            </div>
+        ` : `
+            <div style="margin:20px 0; padding:15px; background:#f0fdf4; border:1.2px solid #2F8F83; border-radius:12px;">
+                <p style="margin:0; font-size:14px; color:#444;">Our team will review your request and contact you within 30 minutes with the final delivery charges.</p>
+            </div>
+        `;
+
         await transporter.sendMail({
             from: `"Rider of Faisalabad" <${process.env.SMTP_USER}>`,
             to: order.email,
@@ -173,14 +211,19 @@ async function sendOrderEmails(order, products) {
                 <div style="font-family:sans-serif; color:#444; line-height:1.6; max-width:600px; margin:0 auto; padding:20px; border:1px solid #eee; border-radius:15px;">
                     <h2 style="color:#2F8F83;">Order Placed Successfully!</h2>
                     <p>Hello <strong>${order.fullName}</strong>,</p>
-                    <p>We've received your delivery request. Our team will review it and contact you shortly with the final charges.</p>
+                    <p>We've received your delivery request. ${order.totalPrice ? 'You can proceed with the payment below.' : 'Our team will review it and contact you shortly.'}</p>
+                    
                     <div style="background:#f8f9fa; padding:15px; border-radius:10px; margin:15px 0;">
                         <p style="margin:0;"><strong>Tracking ID:</strong> <span style="color:#2F8F83; font-weight:bold;">${order.trackingId}</span></p>
                     </div>
+
                     ${productHtml}
-                    <p>Keep this ID to track your order on our website.</p>
-                    <div style="margin-top:20px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
-                        <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Need help?</strong> If you have any questions, concerns, or face any issues with your order, feel free to contact us directly at <strong style="color:#2F8F83;">0306-9810032</strong>. We're here to help!</p>
+                    ${paymentInfoHtml}
+
+                    <p>Track your order live here: <a href="https://riderofaisalabad.com/track-order?id=${order.trackingId}" style="color:#2F8F83; font-weight:bold; text-decoration:none;">Track Order Link</a></p>
+                    
+                    <div style="margin-top:20px; padding:15px; background:#f9fafb; border-radius:10px; border:1px solid #e5e7eb;">
+                        <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Need help?</strong> Contact us directly at <strong style="color:#2F8F83;">0306-9810032</strong>.</p>
                     </div>
                     <br/>
                     <p>Best Regards,<br/><strong>Rider of Faisalabad Team</strong></p>

@@ -143,7 +143,8 @@ export default function TrackOrderPage() {
             const data = await res.json();
             if (data.success) {
                 setUploaded(true);
-                setOrder(prev => ({ ...prev, status: 'In Progress', paymentScreenshot: data.url }));
+                setOrder(prev => ({ ...prev, paymentScreenshot: data.url }));
+                toast.success('Screenshot uploaded! Awaiting Admin approval for In Progress status.');
             } else {
                 alert(data.message || 'Upload failed.');
             }
@@ -354,6 +355,72 @@ export default function TrackOrderPage() {
                                             )}
                                         </div>
 
+                                        {/* Payment Section for Accepted Order */}
+                                        {order.status === 'Accepted' && (
+                                            <div className={styles.paymentSection} style={{ marginTop: '20px', padding: '20px', background: '#fdfaf0', border: '1px solid #F4C542', borderRadius: '12px' }}>
+                                                <h3 style={{ marginTop: 0, color: '#222', fontSize: '18px' }}>Action Required: Payment</h3>
+
+                                                <div style={{ margin: '15px 0', padding: '15px', background: '#fff', borderRadius: '8px', border: '1px dashed #2F8F83', textAlign: 'center' }}>
+                                                    <span style={{ fontSize: '14px', color: '#555' }}>Total Delivery & Items Price:</span>
+                                                    <div style={{ fontSize: '24px', fontWeight: '900', color: '#2F8F83' }}>RS. {order.totalPrice || order.totalPrice === 0 ? order.totalPrice.toLocaleString() : 'To be confirmed'}</div>
+                                                </div>
+
+                                                <p style={{ fontSize: '14px', color: '#555', marginBottom: '15px' }}>
+                                                    To move your order to <strong>"In Progress"</strong>, please make the payment using one of the given accounts and upload the screenshot.
+                                                </p>
+
+                                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+                                                    <div style={{ background: 'white', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
+                                                        <strong style={{ display: 'block', marginBottom: '8px', color: '#222' }}>JazzCash</strong>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span style={{ color: '#2F8F83', fontWeight: '700' }}>0302-7201810</span>
+                                                            <button type="button" onClick={() => copyToClipboard('03027201810')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}><FiCopy size={14} /></button>
+                                                        </div>
+                                                        <div style={{ fontSize: '12px', color: '#777', marginTop: '4px' }}>Title: WAQAS AHMAD</div>
+                                                    </div>
+
+                                                    <div style={{ background: 'white', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
+                                                        <strong style={{ display: 'block', marginBottom: '8px', color: '#222' }}>EasyPaisa</strong>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span style={{ color: '#2F8F83', fontWeight: '700' }}>0302-7201810</span>
+                                                            <button type="button" onClick={() => copyToClipboard('03027201810')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}><FiCopy size={14} /></button>
+                                                        </div>
+                                                        <div style={{ fontSize: '12px', color: '#777', marginTop: '4px' }}>Title: WAQAS AHMAD</div>
+                                                    </div>
+
+                                                    <div style={{ background: 'white', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
+                                                        <strong style={{ display: 'block', marginBottom: '8px', color: '#222' }}>HBL Bank</strong>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <span style={{ color: '#2F8F83', fontWeight: '700' }}>14667905719303</span>
+                                                            <button type="button" onClick={() => copyToClipboard('14667905719303')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}><FiCopy size={14} /></button>
+                                                        </div>
+                                                        <div style={{ fontSize: '12px', color: '#777', marginTop: '4px' }}>Title: WAQAS AHMAD</div>
+                                                    </div>
+                                                </div>
+
+                                                {(!order.paymentScreenshot && !uploaded) ? (
+                                                    <form onSubmit={handlePaymentUpload} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                        <label className="form-label" style={{ fontWeight: '600' }}><FiUpload size={14} /> Upload Payment Screenshot:</label>
+                                                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*,.pdf"
+                                                                onChange={e => setPaymentFile(e.target.files[0])}
+                                                                style={{ padding: '8px', border: '1px dashed #ccc', borderRadius: '8px', flex: 1, minWidth: '200px', background: 'white' }}
+                                                            />
+                                                            <button type="submit" className="btn btn-teal" disabled={uploading || !paymentFile} style={{ padding: '10px 20px', borderRadius: '8px', whiteSpace: 'nowrap' }}>
+                                                                {uploading ? 'Uploading...' : 'Submit Screenshot'}
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                ) : (
+                                                    <div style={{ background: '#d1fae5', color: '#065f46', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                        <FiCheckCircle size={18} />
+                                                        <strong>Screenshot Uploaded! Waiting for Admin verification to proceed.</strong>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Feedback Section (Shown if delivered) */}

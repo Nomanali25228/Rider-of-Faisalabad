@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare, FiCopy, FiCalendar } from 'react-icons/fi';
+import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare, FiCopy, FiCalendar, FiClock } from 'react-icons/fi';
 import styles from './OrderForm.module.css';
 import dynamic from 'next/dynamic';
 
@@ -23,6 +23,7 @@ const initialState = {
     deliveryDate: '',
     message: '',
     voiceNote: null,
+    addOns: { teddyBear: false, chocolate: false },
 };
 
 export default function OrderForm({ compact = false, onProductsChange, cartRefresh }) {
@@ -191,6 +192,29 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
+    const getItemsTotalText = () => {
+        if (!selectedProducts || selectedProducts.length === 0) return 'Delivery Charges Only (ToBeConfirmed)';
+        const prices = selectedProducts.map(p => p.price && typeof p.price === 'string' ? p.price : String(p.price || ''));
+        if (prices.some(p => p.includes('-'))) {
+            let minTotal = 0;
+            let maxTotal = 0;
+            prices.forEach(p => {
+                const parts = p.split('-').map(str => parseInt(str.replace(/[^0-9]/g, '')) || 0);
+                if (parts.length === 2) {
+                    minTotal += parts[0];
+                    maxTotal += parts[1];
+                } else {
+                    minTotal += parts[0] || 0;
+                    maxTotal += parts[0] || 0;
+                }
+            });
+            return `RS. ${minTotal} - ${maxTotal} + Delivery Phase`;
+        } else {
+            const sum = prices.reduce((a, b) => a + (parseInt(b.replace(/[^0-9]/g, '')) || 0), 0);
+            return `RS. ${sum.toLocaleString()} + Delivery Phase`;
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         // Validate
@@ -235,6 +259,8 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
             if (attachment) {
                 formData.append('attachment', attachment);
             }
+
+            let finalMessage = form.message;
 
             const res = await fetch('/api/orders/create', {
                 method: 'POST',
@@ -465,18 +491,20 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                     </div>
                 )}
 
+
+
                 {/* Delivery Type */}
                 <div className={`form-group ${styles.fullWidth}`}>
                     <label className="form-label">Delivery Type <span className={styles.req}>*</span></label>
                     <div className={styles.deliveryTypes}>
-                        {['Normal', 'Urgent', 'Same Day'].map(type => (
+                        {['Normal', 'Same Day'].map(type => (
                             <button
                                 type="button"
                                 key={type}
                                 className={`${styles.typeBtn} ${form.deliveryType === type ? styles.typeBtnActive : ''}`}
                                 onClick={() => setForm(prev => ({ ...prev, deliveryType: type }))}
                             >
-                                {type === 'Urgent' ? '⚡' : type === 'Same Day' ? '🚀' : '📦'} {type}
+                                {type === 'Same Day' ? '🚀' : '📦'} {type}
                             </button>
                         ))}
                     </div>
@@ -486,7 +514,6 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                         animate={{ opacity: 1, x: 0 }}
                         className={styles.typeDescription}
                     >
-                        {form.deliveryType === 'Urgent' && '🚀 Delivery within 1 to 2 hours. Priority handling.'}
                         {form.deliveryType === 'Same Day' && '📅 Guaranteed delivery on the same day the order is placed.'}
                         {form.deliveryType === 'Normal' && '📦 Standard delivery within 24 to 48 hours.'}
                     </motion.div>
@@ -533,38 +560,90 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                     />
                 </div>
 
-                {/* Attachment Upload */}
-                <div className={`form-group ${styles.fullWidth}`} id="attachment">
-                    <label className="form-label">
-                        <FiUpload size={14} /> Upload Screenshot/Files (Optional)
-                    </label>
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChange}
-                        accept="image/*,.pdf,.doc,.docx"
-                    />
-                    {!attachment ? (
-                        <div
-                            className={styles.uploadZone}
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <FiUpload size={24} className={styles.uploadIcon} />
-                            <span className={styles.uploadText}>
-                                {selectedProducts.length > 0 ? 'Upload Payment Screenshot here' : 'Click or drag file to upload'}
-                            </span>
-                            <span className={styles.uploadSubtext}>
-                                {selectedProducts.length > 0 ? 'JazzCash / EasyPaisa / Bank Transfer (Max 5MB)' : 'JPG, PNG, PDF (Max 5MB)'}
-                            </span>
+                {/* Payment & Attachment Upload */}
+                <div className={`form-group ${styles.fullWidth}`} id="attachment" style={{ marginTop: '20px' }}>
+
+                    {selectedProducts && selectedProducts.length > 0 ? (
+                        <div style={{ background: '#fdfaf0', padding: '20px', borderRadius: '12px', border: '1.5px solid #F4C542', marginBottom: '15px' }}>
+                            <h4 style={{ margin: '0 0 15px 0', color: '#2F8F83', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FiPackage size={18} /> Pre-Book Payment
+                            </h4>
+
+                            <div style={{ padding: '15px', background: '#fff', borderRadius: '8px', border: '1px dashed #2F8F83', textAlign: 'center', marginBottom: '15px' }}>
+                                <span style={{ fontSize: '14px', color: '#555' }}>Items & Delivery Estimate:</span>
+                                <div style={{ fontSize: '20px', fontWeight: '900', color: '#2F8F83', marginTop: '5px' }}>
+                                    {getItemsTotalText()}
+                                </div>
+                            </div>
+
+                            <p style={{ fontSize: '14px', color: '#444', marginBottom: '15px', lineHeight: '1.5' }}>
+                                If you'd like to pay immediately, please transfer to any of the accounts below and upload the screenshot. It will speed up your order!
+                            </p>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '10px', marginBottom: '15px' }}>
+                                <div style={{ background: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #eee' }}>
+                                    <strong style={{ display: 'block', marginBottom: '5px', color: '#222', fontSize: '14px' }}>JazzCash / EasyPaisa</strong>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ color: '#2F8F83', fontWeight: '700', fontSize: '14px' }}>0302-7201810</span>
+                                        <button type="button" onClick={() => copyToClipboard('03027201810')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}><FiCopy size={14} /></button>
+                                    </div>
+                                    <div style={{ fontSize: '11px', color: '#777', marginTop: '2px' }}>Title: WAQAS AHMAD</div>
+                                </div>
+
+                                <div style={{ background: 'white', padding: '12px', borderRadius: '8px', border: '1px solid #eee' }}>
+                                    <strong style={{ display: 'block', marginBottom: '5px', color: '#222', fontSize: '14px' }}>HBL Bank</strong>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span style={{ color: '#2F8F83', fontWeight: '700', fontSize: '14px' }}>14667905719303</span>
+                                        <button type="button" onClick={() => copyToClipboard('14667905719303')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666' }}><FiCopy size={14} /></button>
+                                    </div>
+                                    <div style={{ fontSize: '11px', color: '#777', marginTop: '2px' }}>Title: WAQAS AHMAD</div>
+                                </div>
+                            </div>
+
+                            <label className="form-label" style={{ marginTop: '10px' }}>
+                                <FiUpload size={14} /> Upload Payment Screenshot
+                            </label>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleFileChange}
+                                accept="image/*,.pdf"
+                            />
+                            {!attachment ? (
+                                <div
+                                    className={styles.uploadZone}
+                                    onClick={() => fileInputRef.current?.click()}
+                                    style={{ background: '#fff' }}
+                                >
+                                    <FiUpload size={24} className={styles.uploadIcon} />
+                                    <span className={styles.uploadText}>
+                                        Click here to upload payment screenshot
+                                    </span>
+                                    <span className={styles.uploadSubtext}>
+                                        JPG, PNG (Max 5MB)
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className={styles.filePreview} style={{ background: '#fff' }}>
+                                    <FiPackage size={18} color="#2F8F83" />
+                                    <span className={styles.fileName}>{attachment.name}</span>
+                                    <button type="button" className={styles.deleteVoice} onClick={() => setAttachment(null)}>
+                                        <FiTrash2 size={16} />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     ) : (
-                        <div className={styles.filePreview}>
-                            <FiPackage size={18} color="#2F8F83" />
-                            <span className={styles.fileName}>{attachment.name}</span>
-                            <button type="button" className={styles.deleteVoice} onClick={() => setAttachment(null)}>
-                                <FiTrash2 size={16} />
-                            </button>
+                        <div style={{ background: '#fdfaf0', padding: '20px', borderRadius: '12px', border: '1.5px solid #F4C542', marginBottom: '15px', textAlign: 'left' }}>
+                            <FiClock size={32} color="#2F8F83" style={{ marginBottom: '10px' }} />
+                            <h4 style={{ margin: '0 0 10px 0', color: '#2F8F83', fontSize: '18px' }}>Estimated Cost</h4>
+                            <p style={{ fontSize: '15px', color: '#444', margin: '0 0 8px 0', fontWeight: 'bold' }} dir="rtl">
+                                بکنگ کے 30 منٹ کے اندر آپ کو کل چارجز بتا دیے جائیں گے۔
+                            </p>
+                            <p style={{ fontSize: '13px', color: '#444', margin: 0, fontWeight: '500' }}>
+                                Total delivery cost will be shared with you within 30 minutes of order submission.
+                            </p>
                         </div>
                     )}
                 </div>

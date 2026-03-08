@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle, FiTrash2, FiImage } from 'react-icons/fi';
+import { FiCheck, FiX, FiEye, FiMic, FiMapPin, FiClock, FiXCircle, FiTrash2, FiImage, FiCheckCircle } from 'react-icons/fi';
 import styles from './AdminOrderTable.module.css';
 
 const STATUS_OPTIONS = ['Pending', 'Accepted', 'In Progress', 'Delivered'];
@@ -52,8 +52,28 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
     const [rejectOrderId, setRejectOrderId] = useState(null);
     const [rejectReason, setRejectReason] = useState('');
 
-    const handleStatusChange = async (orderId, newStatus, reason = null) => {
-        if (newStatus === 'Rejected' && !reason) {
+    // Accept Modal State
+    const [showAcceptModal, setShowAcceptModal] = useState(false);
+    const [acceptOrderId, setAcceptOrderId] = useState(null);
+    const [totalPrice, setTotalPrice] = useState('');
+
+    const handleStatusChange = async (orderId, newStatus, extraData = null) => {
+        const order = orders.find(o => (o._id === orderId || o.trackingId === orderId));
+        const hasScreenshot = order?.paymentScreenshot || order?.attachmentUrl;
+
+        if (newStatus === 'Accepted' && !hasScreenshot && (!extraData || !extraData.totalPrice)) {
+            setAcceptOrderId(orderId);
+            setTotalPrice('');
+            setShowAcceptModal(true);
+            return;
+        }
+
+        // If it has a screenshot, we can auto-accept with existing totalPrice (if any)
+        const finalExtraData = (newStatus === 'Accepted' && hasScreenshot && !extraData?.totalPrice)
+            ? { ...extraData, totalPrice: order.totalPrice || 'Paid' }
+            : extraData;
+
+        if (newStatus === 'Rejected' && (!extraData || !extraData.rejectionReason)) {
             setRejectOrderId(orderId);
             setRejectReason('');
             setShowRejectModal(true);
@@ -62,10 +82,10 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
 
         setUpdating(orderId);
         try {
-            // Let the parent (Dashboard) handle the actual API call
-            const success = await onStatusChange?.(orderId, newStatus, reason);
+            const success = await onStatusChange?.(orderId, newStatus, finalExtraData);
             if (success) {
                 setShowRejectModal(false);
+                setShowAcceptModal(false);
             }
         } catch (err) {
             console.error('Update failed:', err);
@@ -79,7 +99,15 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
             toast.error('Please enter or select a reason.');
             return;
         }
-        handleStatusChange(rejectOrderId, 'Rejected', rejectReason);
+        handleStatusChange(rejectOrderId, 'Rejected', { rejectionReason: rejectReason });
+    };
+
+    const confirmAcceptance = () => {
+        if (!totalPrice.trim()) {
+            toast.error('Please enter a total price.');
+            return;
+        }
+        handleStatusChange(acceptOrderId, 'Accepted', { totalPrice: totalPrice });
     };
 
     return (
@@ -113,12 +141,13 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     transition={{ delay: i * 0.05 }}
                                 >
                                     <td>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                             <code className={styles.trackCode}>{order.trackingId}</code>
                                             {(order.paymentScreenshot || order.attachmentUrl) && (
-                                                <div className={styles.paymentStatusDot} title="Payment Received">
-                                                    <div className={styles.dotPulse} />
-                                                </div>
+                                                <span style={{ fontSize: '11px', background: '#d1fae5', color: '#065f46', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold', width: 'fit-content', border: '1px solid #34d399' }}>
+                                                    <FiCheckCircle size={10} style={{ display: 'inline', marginRight: '4px' }} />
+                                                    Payment Received
+                                                </span>
                                             )}
                                         </div>
                                     </td>
@@ -382,6 +411,87 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     disabled={updating === rejectOrderId}
                                 >
                                     Confirm Rejection
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Custom Accept Modal */}
+            <AnimatePresence>
+                {showAcceptModal && (
+                    <div className={styles.modalOverlay}>
+                        <motion.div
+                            className={styles.modalContent}
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                        >
+                            <div className={styles.modalHeader}>
+                                <FiCheck size={24} color="#2F8F83" />
+                                <h3>Accept Order</h3>
+                            </div>
+                            <div className={styles.modalBody}>
+                                {(() => {
+                                    const order = orders.find(o => o._id === acceptOrderId || o.trackingId === acceptOrderId);
+                                    if (!order) return null;
+                                    let items = [];
+                                    try { items = order.productDetails ? JSON.parse(order.productDetails) : []; if (!Array.isArray(items)) items = [items]; } catch (e) { }
+
+                                    return (
+                                        <div style={{ marginBottom: '20px' }}>
+                                            <p className={styles.instruction} style={{ marginBottom: '12px' }}>Review items for <strong>{order.trackingId}</strong>:</p>
+
+                                            {items.length > 0 && (
+                                                <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '15px', maxHeight: '150px', overflowY: 'auto' }}>
+                                                    {items.map((item, idx) => (
+                                                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: idx === items.length - 1 ? 0 : '8px' }}>
+                                                            <img src={item.image} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} alt="" />
+                                                            <div style={{ flex: 1 }}>
+                                                                <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>{item.label}</div>
+                                                                <div style={{ fontSize: '12px', color: '#64748b' }}>RS. {item.price}</div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <p className={styles.instruction}>Please enter the Total Price (including delivery) to send a payment request.</p>
+                                            {order.totalPrice && (
+                                                <div style={{ fontSize: '12px', color: '#2F8F83', marginBottom: '8px', fontWeight: 'bold' }}>
+                                                    Shop Items Subtotal: RS. {order.totalPrice.toLocaleString()}
+                                                </div>
+                                            )}
+
+                                            {order.message && (
+                                                <div style={{ background: '#fef3c7', padding: '10px', borderRadius: '8px', border: '1px solid #fcd34d', marginBottom: '15px' }}>
+                                                    <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#92400e', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Customer Instructions:</span>
+                                                    <p style={{ margin: 0, fontSize: '13px', color: '#92400e', lineHeight: '1.4' }}>{order.message}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })()}
+
+                                <input
+                                    className={styles.rejectionInput}
+                                    type="text"
+                                    placeholder="e.g. 5000"
+                                    value={totalPrice}
+                                    onChange={(e) => setTotalPrice(e.target.value)}
+                                    autoFocus
+                                />
+                            </div>
+                            <div className={styles.modalFooter}>
+                                <button className={styles.cancelBtn} onClick={() => setShowAcceptModal(false)}>Cancel</button>
+                                <button
+                                    className={styles.confirmBtn}
+                                    style={{ background: '#2F8F83' }}
+                                    onClick={confirmAcceptance}
+                                    disabled={updating === acceptOrderId}
+                                >
+                                    Confirm & Request Payment
                                 </button>
                             </div>
                         </motion.div>

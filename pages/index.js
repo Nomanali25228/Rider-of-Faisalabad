@@ -322,106 +322,17 @@ export default function HomePage() {
                 {/* Quick Order Form */}
                 <section id="quick-order" className={`section ${styles.orderSection}`}>
                     <div className="container">
-                        <div className={styles.orderGrid}>
+                        <div className={styles.centeredOrderWrapper}>
                             <motion.div
                                 variants={fadeUp}
                                 initial="hidden"
                                 whileInView="visible"
-                                viewport={{ once: true }}
-                            >
-                                <span className="section-badge"><MdDeliveryDining size={14} /> Quick Order</span>
-                                <h2 className="section-title">Book a Delivery <span>Right Now</span></h2>
-                                <p className="section-subtitle" style={{ margin: 0 }}>Fill the form and our team will contact you within 6 hours.</p>
-                                <ul className={styles.orderFeatures}>
-                                    {['Instant tracking ID', 'Email confirmation', 'Secure & insured', 'Available 7 days/week'].map(f => (
-                                        <li key={f}><FiCheck color="#2F8F83" size={16} /> {f}</li>
-                                    ))}
-                                </ul>
-
-                                <AnimatePresence mode="wait">
-                                    {hasProducts ? (
-                                        <motion.div
-                                            key="payment-notice"
-                                            className={styles.premiumOrderNotice}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: 20 }}
-                                        >
-                                            <div className={styles.premiumHeader}>
-                                                <div className={styles.premiumIcon}>💰</div>
-                                                <div>
-                                                    <h4 className={styles.premiumTitle}>Payment Details (Required for Shop Items)</h4>
-                                                    <p className={styles.premiumTagline}>Kindly payment karke screenshot lazmi attach karke order submit kariyega, shukriya!</p>
-                                                </div>
-                                            </div>
-
-                                            <div className={styles.formPaymentMethods}>
-                                                <div className={styles.formMethod}>
-                                                    <div className={styles.methodHead}>
-                                                        <img src="/uploads/jazzcash.png" className={styles.methodLogo} alt="JC" />
-                                                        <strong>JazzCash</strong>
-                                                    </div>
-                                                    <div className={styles.methodNum}>
-                                                        <span>0300-1234567</span>
-                                                        <button type="button" onClick={() => copyToClipboard('0300-1234567')}><FiCopy size={12} /></button>
-                                                    </div>
-                                                    <span className={styles.methodHolderName}>Waqas Ahmed</span>
-                                                </div>
-
-                                                <div className={styles.formMethod}>
-                                                    <div className={styles.methodHead}>
-                                                        <img src="/uploads/easypaisa.jpg" className={styles.methodLogo} alt="EP" />
-                                                        <strong>EasyPaisa</strong>
-                                                    </div>
-                                                    <div className={styles.methodNum}>
-                                                        <span>0300-1234567</span>
-                                                        <button type="button" onClick={() => copyToClipboard('0300-1234567')}><FiCopy size={12} /></button>
-                                                    </div>
-                                                    <span className={styles.methodHolderName}>Waqas Ahmed</span>
-                                                </div>
-
-                                                <div className={`${styles.formMethod} ${styles.fullMethod}`}>
-                                                    <div className={styles.methodHead}>
-                                                        <img src="/uploads/hbl.png" className={styles.methodLogo} alt="HBL" />
-                                                        <strong>HBL Bank</strong>
-                                                    </div>
-                                                    <div className={styles.methodNum}>
-                                                        <span>12345678901234</span>
-                                                        <button type="button" onClick={() => copyToClipboard('12345678901234')}><FiCopy size={12} /></button>
-                                                    </div>
-                                                    <span className={styles.methodHolderName}>Title: Waqas Ahmed</span>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            key="standard-notice"
-                                            className={styles.orderNotice}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: 20 }}
-                                        >
-                                            <div className={styles.noticeIcon}><FiClock size={20} /></div>
-                                            <div className={styles.noticeContent}>
-                                                <p className={styles.urduText}>بکنگ کے 30 منٹ کے اندر آپ کو کل چارجز بتا دیے جائیں گے۔</p>
-                                                <p className={styles.englishText}>Total delivery cost will be shared with you within <strong>30 minutes</strong> of order submission.</p>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                                <p className={styles.urduSlogan}>فوری سروس، بھروسہ مند سفر - صرف رائیڈر آف فیصل آباد کے ساتھ!</p>
-                            </motion.div>
-                            <motion.div
-                                variants={fadeUp}
-                                initial="hidden"
-                                whileInView="visible"
-                                custom={1}
+                                custom={0}
                                 viewport={{ once: true }}
                                 className={styles.formCard}
                             >
                                 <h3 className={styles.formCardTitle}>📦 New Order</h3>
                                 <OrderForm
-                                    compact
                                     onProductsChange={setHasProducts}
                                     cartRefresh={cartRefresh}
                                 />
