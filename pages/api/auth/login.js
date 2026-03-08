@@ -9,7 +9,7 @@ export default function handler(req, res) {
     const adminPass = process.env.ADMIN_PASSWORD || 'Rider2024!';
 
     if (username === adminUser && password === adminPass) {
-        const token = process.env.ADMIN_SECRET || 'admin-secret-2024';
+        const token = process.env.ADMIN_SECRET || 'unjgvwpcasdterzllrnatvonycpbekmk';
         return res.status(200).json({ success: true, token, message: 'Login successful' });
     }
 

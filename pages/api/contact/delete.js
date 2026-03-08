@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ success: false, message: 'ID required' });
 
     try {
-        await githubStore.remove('contact', id);
+        await githubStore.remove('contacts', id);
         return res.status(200).json({ success: true, message: 'Inquiry deleted successfully' });
     } catch (err) {
         console.error('Delete inquiry error:', err);
