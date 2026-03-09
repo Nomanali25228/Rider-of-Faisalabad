@@ -42,38 +42,53 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
         toast.success('Number copied!');
     };
 
-    // Load selected products from localStorage
+    // Load selected products from localStorage and sync across tabs
     useEffect(() => {
-        const savedArr = localStorage.getItem('selectedProducts');
-        const savedSingle = localStorage.getItem('selectedProduct');
+        const loadProducts = () => {
+            const savedArr = localStorage.getItem('selectedProducts');
+            const savedSingle = localStorage.getItem('selectedProduct');
 
-        let products = [];
+            let products = [];
 
-        // Handle migration from single to array
-        if (savedSingle) {
-            try {
-                products.push(JSON.parse(savedSingle));
-                localStorage.removeItem('selectedProduct');
-                localStorage.setItem('selectedProducts', JSON.stringify(products));
-            } catch (e) { }
-        } else if (savedArr) {
-            try {
-                products = JSON.parse(savedArr);
-                if (!Array.isArray(products)) products = [products];
-            } catch (e) { }
-        }
+            // Handle migration from single to array
+            if (savedSingle) {
+                try {
+                    products.push(JSON.parse(savedSingle));
+                    localStorage.removeItem('selectedProduct');
+                    localStorage.setItem('selectedProducts', JSON.stringify(products));
+                } catch (e) { }
+            } else if (savedArr) {
+                try {
+                    products = JSON.parse(savedArr);
+                    if (!Array.isArray(products)) products = [products];
+                } catch (e) { }
+            }
 
-        if (products.length > 0) {
             setSelectedProducts(products);
-            // Auto-fill parcel type if it's the first item
-            setForm(prev => ({
-                ...prev,
-                parcelType: prev.parcelType || products[0].category || 'Gift',
-                message: prev.message || `I want to order: ${products.map(p => p.label).join(', ')}`
-            }));
-        }
-        if (onProductsChange) onProductsChange(products.length > 0);
-    }, [trackingId, cartRefresh]); // Refresh on reset or cart change
+            if (onProductsChange) onProductsChange(products.length > 0);
+
+            if (products.length > 0) {
+                // Auto-fill parcel type and message if it's the first time and form is empty
+                setForm(prev => ({
+                    ...prev,
+                    parcelType: prev.parcelType || products[0].category || 'Gift',
+                    message: prev.message || (prev.message.includes('I want to order') ? prev.message : `I want to order: ${products.map(p => p.label).join(', ')}`)
+                }));
+            }
+        };
+
+        loadProducts();
+
+        // Sync items if changed in another tab
+        const handleStorageChange = (e) => {
+            if (e.key === 'selectedProducts' || e.key === 'selectedProduct') {
+                loadProducts();
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, [trackingId, cartRefresh, onProductsChange]);
 
     const removeProduct = (index) => {
         const updated = selectedProducts.filter((_, i) => i !== index);
