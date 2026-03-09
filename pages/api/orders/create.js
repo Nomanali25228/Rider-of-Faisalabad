@@ -61,6 +61,17 @@ export default async function handler(req, res) {
             try { fs.unlinkSync(attachmentFile.filepath); } catch (e) { console.error('Cleanup failed:', e); }
         }
 
+        // Parse product details early
+        let parsedProducts = [];
+        if (orderData.productDetails) {
+            try {
+                parsedProducts = JSON.parse(orderData.productDetails);
+                if (!Array.isArray(parsedProducts)) parsedProducts = [parsedProducts];
+            } catch (e) {
+                console.error('Failed to parse product details:', e);
+            }
+        }
+
         // Calculate initial total price for shop items if any
         let totalPrice = null;
         if (parsedProducts.length > 0) {
@@ -80,17 +91,6 @@ export default async function handler(req, res) {
             status: 'Pending',
             createdAt: new Date().toISOString(),
         };
-
-        // Parse product details for email if present
-        let parsedProducts = [];
-        if (order.productDetails) {
-            try {
-                parsedProducts = JSON.parse(order.productDetails);
-                if (!Array.isArray(parsedProducts)) parsedProducts = [parsedProducts];
-            } catch (e) {
-                console.error('Failed to parse product details:', e);
-            }
-        }
 
         await saveOrder(order);
 
