@@ -51,20 +51,24 @@ export default function Navbar() {
                 >
                     <div className={styles.marqueeContent}>
                         <div className={styles.marqueeItem}>
-                            <span>🎉 EID SPECIAL OFFER: 50% DISCOUNT ON ALL SERVICES!</span>
+                            <span>🎉 WELCOME TO RIDER OF FAISALABAD!</span>
+                            <span className={styles.separator}>★</span>
+                            <span>NO EXTRA DELIVERY CHARGES</span>
                             <span className={styles.separator}>★</span>
                             <span>FASTEST DELIVERY IN FAISALABAD</span>
                             <span className={styles.separator}>★</span>
-                            <span>BOOK YOUR RIDE NOW AND SAVE BIG</span>
+                            <span>PREMIUM CAKES & CUSTOM GIFTS</span>
                             <span className={styles.separator}>★</span>
                         </div>
                         {/* Duplicate for seamless loop */}
                         <div className={styles.marqueeItem}>
-                            <span>🎉 EID SPECIAL OFFER: 50% DISCOUNT ON ALL SERVICES!</span>
+                            <span>🎉 WELCOME TO RIDER OF FAISALABAD!</span>
+                            <span className={styles.separator}>★</span>
+                            <span>NO EXTRA DELIVERY CHARGES</span>
                             <span className={styles.separator}>★</span>
                             <span>FASTEST DELIVERY IN FAISALABAD</span>
                             <span className={styles.separator}>★</span>
-                            <span>BOOK YOUR RIDE NOW AND SAVE BIG</span>
+                            <span>PREMIUM CAKES & CUSTOM GIFTS</span>
                             <span className={styles.separator}>★</span>
                         </div>
                     </div>
@@ -185,6 +189,19 @@ export default function Navbar() {
                                         </Link>
                                     </motion.li>
                                 ))}
+                                {/* Added How to Order specifically for Mobile Drawer */}
+                                <motion.li
+                                    initial={{ opacity: 0, x: 30 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: navLinks.length * 0.06 }}
+                                >
+                                    <Link
+                                        href="/how-to-order"
+                                        className={`${styles.drawerLink} ${router.pathname === '/how-to-order' ? styles.drawerLinkActive : ''}`}
+                                    >
+                                        How to Order
+                                    </Link>
+                                </motion.li>
                             </ul>
                             <div className={styles.drawerActions}>
                                 <Link href="/#quick-order" className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setMenuOpen(false)}>
