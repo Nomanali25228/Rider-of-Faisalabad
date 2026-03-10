@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { FiPackage, FiSearch, FiShield, FiClock, FiStar, FiMapPin } from 'react-icons/fi';
+import { FiPackage, FiSearch, FiShield, FiClock, FiStar, FiMapPin, FiCheck } from 'react-icons/fi';
 import { MdDeliveryDining } from 'react-icons/md';
 import styles from './Hero.module.css';
 

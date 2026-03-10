@@ -518,6 +518,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
 }
 
 /* Submit */
@@ -670,5 +671,178 @@
     .audioPreview {
         width: 100%;
         max-width: 100%;
+    }
+}
+
+/* Payment Section */
+.paymentBox {
+    background: #fdfaf0;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1.5px solid #F4C542;
+    margin-bottom: 20px;
+}
+
+.paymentTitle {
+    margin: 0 0 16px 0;
+    color: #2F8F83;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.estimateBox {
+    padding: 18px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px dashed #2F8F83;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.estimateLabel {
+    font-size: 14px;
+    color: #666;
+    display: block;
+}
+
+.estimateValue {
+    font-size: 22px;
+    font-weight: 900;
+    color: #2F8F83;
+    margin-top: 6px;
+}
+
+.paymentText {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.accountsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.accountCard {
+    background: white;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    transition: all 0.2s;
+}
+
+.accountCard:hover {
+    border-color: #2F8F83;
+}
+
+.accountLabel {
+    display: block;
+    margin-bottom: 6px;
+    color: #222;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.accountDetail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.accountNumber {
+    color: #2F8F83;
+    font-weight: 800;
+    font-size: 15px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.accountTitle {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.copyBtn {
+    background: #f8fafc;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.copyBtn:hover {
+    background: #e2e8f0;
+    color: #2F8F83;
+}
+
+.costNoticeBox {
+    background: #fdfaf0;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1.5px solid #F4C542;
+    margin-bottom: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.costNoticeTitle {
+    margin: 0;
+    color: #2F8F83;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.costNoticeUrdu {
+    font-size: 16px;
+    color: #222;
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.costNoticeEnglish {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Response improvements for mobile */
+@media (max-width: 640px) {
+
+    .paymentBox,
+    .costNoticeBox {
+        padding: 16px;
+    }
+
+    .accountsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .estimateValue {
+        font-size: 18px;
+    }
+
+    .filePreview {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .fileName {
+        font-size: 12px;
     }
 }

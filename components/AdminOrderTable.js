@@ -26,7 +26,34 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
     const [selected, setSelected] = useState(null);
     const [updating, setUpdating] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
+    const [viewedOrders, setViewedOrders] = useState(() => {
+        try {
+            const saved = localStorage.getItem('viewedOrders');
+            return saved ? JSON.parse(saved) : [];
+        } catch { return []; }
+    });
     const detailRef = useRef(null);
+
+    // Sort orders: newest first, unviewed first within same time
+    const sortedOrders = [...orders].sort((a, b) => {
+        const aViewed = viewedOrders.includes(a._id || a.trackingId);
+        const bViewed = viewedOrders.includes(b._id || b.trackingId);
+        if (!aViewed && bViewed) return -1;
+        if (aViewed && !bViewed) return 1;
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+
+    const isNew = (order) => !viewedOrders.includes(order._id || order.trackingId);
+
+    const markAsViewed = (order) => {
+        const id = order._id || order.trackingId;
+        setViewedOrders(prev => {
+            if (prev.includes(id)) return prev;
+            const updated = [...prev, id];
+            try { localStorage.setItem('viewedOrders', JSON.stringify(updated)); } catch { }
+            return updated;
+        });
+    };
 
     // Auto-scroll to details when opened
     useEffect(() => {
@@ -40,6 +67,7 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
     }, [selected]);
 
     const handleSelectOrder = (order) => {
+        markAsViewed(order);
         if (selected?.trackingId === order.trackingId) {
             setSelected(null);
         } else {
@@ -127,22 +155,30 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                         </tr>
                     </thead>
                     <tbody>
-                        {orders.length === 0 ? (
+                        {sortedOrders.length === 0 ? (
                             <tr>
                                 <td colSpan={7} className={styles.emptyRow}>No orders found.</td>
                             </tr>
                         ) : (
-                            orders.map((order, i) => (
+                            sortedOrders.map((order, i) => (
                                 <motion.tr
                                     key={order._id || order.trackingId}
-                                    className={styles.tableRow}
+                                    className={`${styles.tableRow} ${isNew(order) ? styles.tableRowNew : ''} ${selected?.trackingId === order.trackingId ? styles.tableRowSelected : ''}`}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.05 }}
+                                    transition={{ delay: i * 0.04 }}
+                                    onClick={() => handleSelectOrder(order)}
+                                    style={{ cursor: 'pointer' }}
+                                    title="Click to view order details"
                                 >
                                     <td>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                             <code className={styles.trackCode}>{order.trackingId}</code>
+                                            {isNew(order) && (
+                                                <span className={styles.newOrderBadge}>
+                                                    🔔 NEW ORDER
+                                                </span>
+                                            )}
                                             {(order.paymentScreenshot || order.attachmentUrl) && (
                                                 <span style={{ fontSize: '11px', background: '#d1fae5', color: '#065f46', padding: '3px 8px', borderRadius: '6px', fontWeight: 'bold', width: 'fit-content', border: '1px solid #34d399' }}>
                                                     <FiCheckCircle size={10} style={{ display: 'inline', marginRight: '4px' }} />
@@ -163,7 +199,7 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                             {order.deliveryType}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td onClick={e => e.stopPropagation()}>
                                         <select
                                             className={`badge ${statusClass[order.status]} ${styles.statusSelect}`}
                                             value={order.status}
@@ -178,14 +214,14 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                     </td>
                                     <td>
                                         <span className={styles.date}>
-                                            {new Date(order.createdAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short' })}
+                                            {new Date(order.createdAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td onClick={e => e.stopPropagation()}>
                                         <div className={styles.actionBtns}>
                                             <button
-                                                className={styles.iconBtn}
-                                                onClick={() => handleSelectOrder(order)}
+                                                className={`${styles.iconBtn} ${selected?.trackingId === order.trackingId ? styles.iconBtnActive : ''}`}
+                                                onClick={(e) => { e.stopPropagation(); handleSelectOrder(order); }}
                                                 title="View Details"
                                                 aria-label="View order details"
                                             >
@@ -196,7 +232,7 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                                 <>
                                                     {order.voiceNoteUrl && (
                                                         <button
-                                                            onClick={() => handleSelectOrder(order)}
+                                                            onClick={(e) => { e.stopPropagation(); handleSelectOrder(order); }}
                                                             className={`${styles.iconBtn} ${styles.voiceBtn}`}
                                                             title="Listen to Voice Note"
                                                         >
@@ -207,14 +243,14 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                                         <>
                                                             <button
                                                                 className={`${styles.iconBtn} ${styles.acceptBtn}`}
-                                                                onClick={() => handleStatusChange(order._id || order.trackingId, 'Accepted')}
+                                                                onClick={(e) => { e.stopPropagation(); handleStatusChange(order._id || order.trackingId, 'Accepted'); }}
                                                                 title="Accept Order"
                                                             >
                                                                 <FiCheck size={15} />
                                                             </button>
                                                             <button
                                                                 className={`${styles.iconBtn} ${styles.rejectBtn}`}
-                                                                onClick={() => handleStatusChange(order._id || order.trackingId, 'Rejected')}
+                                                                onClick={(e) => { e.stopPropagation(); handleStatusChange(order._id || order.trackingId, 'Rejected'); }}
                                                                 title="Reject Order"
                                                             >
                                                                 <FiX size={15} />
@@ -225,13 +261,14 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                             )}
 
                                             {order.status === 'Rejected' && (
-                                                <span className={styles.cancelledLabel}>Order Cancelled</span>
+                                                <span className={styles.cancelledLabel}>Cancelled</span>
                                             )}
 
                                             <button
                                                 className={`${styles.iconBtn} ${styles.rejectBtn}`}
-                                                style={{ marginLeft: '8px' }}
-                                                onClick={() => {
+                                                style={{ marginLeft: '4px' }}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     if (window.confirm('Are you sure you want to delete this order?')) {
                                                         onDelete?.(order._id || order.trackingId);
                                                     }

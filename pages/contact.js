@@ -316,7 +316,11 @@ export default function ContactPage() {
                                                 ) : (
                                                     <div className={styles.filePreview}>
                                                         <FiUpload size={18} color="#2F8F83" />
-                                                        <span className={styles.fileName}>{attachment.name}</span>
+                                                        <span className={styles.fileName}>
+                                                            {attachment.name.length > 20
+                                                                ? attachment.name.substring(0, 15) + '...' + attachment.name.split('.').pop()
+                                                                : attachment.name}
+                                                        </span>
                                                         <button type="button" className={styles.deleteVoice} onClick={() => setAttachment(null)}>
                                                             <FiTrash2 size={16} />
                                                         </button>
@@ -368,15 +372,7 @@ export default function ContactPage() {
                             </motion.div>
                         </div>
 
-                        {/* Map */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            style={{ marginTop: 48 }}
-                        >
-                            <MapLocation />
-                        </motion.div>
+
                     </div>
                 </section>
             </div>

@@ -43,23 +43,30 @@ export default async function handler(req, res) {
         const trackingId = `RF-${uuidv4().substring(0, 8).toUpperCase()}`;
         const orderId = uuidv4();
 
-        // Handle File Uploads
-        let voiceNoteUrl = null;
-        let attachmentUrl = null;
+        // Handle File Uploads in Parallel
+        const uploadPromises = [];
+        let voiceFile = files.voiceNote?.[0] || files.voiceNote;
+        let attachmentFile = files.attachment?.[0] || files.attachment;
 
-        // Process Voice Note
-        const voiceFile = files.voiceNote?.[0] || files.voiceNote;
         if (voiceFile && voiceFile.size > 0) {
-            voiceNoteUrl = await uploadToCloudinary(voiceFile.filepath, 'voice_notes');
-            try { fs.unlinkSync(voiceFile.filepath); } catch (e) { console.error('Cleanup failed:', e); }
+            uploadPromises.push((async () => {
+                const url = await uploadToCloudinary(voiceFile.filepath, 'voice_notes');
+                fs.promises.unlink(voiceFile.filepath).catch(e => console.error('Cleanup failed:', e));
+                return { type: 'voiceNote', url };
+            })());
         }
 
-        // Process Attachment
-        const attachmentFile = files.attachment?.[0] || files.attachment;
         if (attachmentFile && attachmentFile.size > 0) {
-            attachmentUrl = await uploadToCloudinary(attachmentFile.filepath, 'order_attachments');
-            try { fs.unlinkSync(attachmentFile.filepath); } catch (e) { console.error('Cleanup failed:', e); }
+            uploadPromises.push((async () => {
+                const url = await uploadToCloudinary(attachmentFile.filepath, 'order_attachments');
+                fs.promises.unlink(attachmentFile.filepath).catch(e => console.error('Cleanup failed:', e));
+                return { type: 'attachment', url };
+            })());
         }
+
+        const uploadResults = await Promise.all(uploadPromises);
+        let voiceNoteUrl = uploadResults.find(r => r.type === 'voiceNote')?.url || null;
+        let attachmentUrl = uploadResults.find(r => r.type === 'attachment')?.url || null;
 
         // Parse product details early
         let parsedProducts = [];

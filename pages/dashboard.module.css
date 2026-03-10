@@ -270,28 +270,39 @@
     transition: all 0.2s ease;
 }
 
-.filterTab:hover {
+/* Hover only for NON-active tabs */
+.filterTab:not(.filterTabActive):hover {
     border-color: #2F8F83;
     color: #2F8F83;
+    background: rgba(47, 143, 131, 0.06);
 }
 
 .filterTabActive {
     background: #2F8F83;
-    color: white;
+    color: white !important;
     border-color: #2F8F83;
 }
 
+/* Active tab hover — keep white text, slightly darker green */
+.filterTabActive:hover {
+    background: #267a6f;
+    color: white !important;
+    border-color: #267a6f;
+}
+
 .tabCount {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(47, 143, 131, 0.12);
+    color: #2F8F83;
     padding: 1px 7px;
     border-radius: 100px;
     font-size: 11px;
     font-weight: 700;
 }
 
-.filterTab:not(.filterTabActive) .tabCount {
-    background: rgba(47, 143, 131, 0.1);
-    color: #2F8F83;
+/* Active tab count — white text on green background */
+.filterTabActive .tabCount {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
 }
 
 @media (max-width: 768px) {

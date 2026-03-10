@@ -53,11 +53,63 @@
 }
 
 .tableRow:hover {
-    background: rgba(47, 143, 131, 0.03);
+    background: rgba(47, 143, 131, 0.04);
 }
 
 .tableRow:last-child {
     border-bottom: none;
+}
+
+/* Unread / new order highlight */
+.tableRowNew {
+    background: rgba(251, 191, 36, 0.06);
+    border-left: 3px solid #f59e0b;
+}
+
+.tableRowNew:hover {
+    background: rgba(251, 191, 36, 0.12);
+}
+
+/* Currently open / selected row */
+.tableRowSelected {
+    background: rgba(47, 143, 131, 0.07) !important;
+    border-left: 3px solid #2F8F83;
+}
+
+/* Pulsing NEW ORDER badge */
+.newOrderBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 800;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 2px 7px;
+    width: fit-content;
+    letter-spacing: 0.04em;
+    animation: newPulse 2s ease-in-out infinite;
+}
+
+@keyframes newPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(245, 158, 11, 0);
+    }
+}
+
+/* Eye icon active state when detail panel is open */
+.iconBtnActive {
+    background: rgba(47, 143, 131, 0.15) !important;
+    border-color: #2F8F83 !important;
+    color: #2F8F83 !important;
 }
 
 .table td {
@@ -586,6 +638,7 @@
     background: #9b2c2c;
     transform: translateY(-1px);
 }
+
 /* Lightbox */
 .lightboxOverlay {
     position: fixed;
@@ -618,16 +671,16 @@
     max-height: 90vh;
     object-fit: contain;
     border-radius: 12px;
-    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .lightboxClose {
     position: absolute;
     top: -50px;
     right: -20px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: 2px solid rgba(255,255,255,0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     width: 44px;
     height: 44px;
     border-radius: 50%;

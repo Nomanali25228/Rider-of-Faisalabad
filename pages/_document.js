@@ -6,6 +6,8 @@ export default function Document() {
             <Head>
                 <meta name="theme-color" content="#2F8F83" />
                 <link rel="icon" href="/favicon.ico" />
+                <link rel="manifest" href="/manifest.json" />
+                <link rel="apple-touch-icon" href="/icon-192x192.png" />
                 <link rel="canonical" href="https://riderofaisalabad.com" />
                 <meta name="robots" content="index, follow" />
                 <meta property="og:locale" content="en_PK" />
