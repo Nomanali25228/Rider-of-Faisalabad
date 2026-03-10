@@ -27,7 +27,7 @@ function StarRating({ value, onChange }) {
 }
 
 export default function FeedbackPage() {
-    const [form, setForm] = useState({ name: '', email: '', rating: 0, text: '' });
+    const [form, setForm] = useState({ name: '', email: '', location: '', rating: 0, text: '' });
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState({});
@@ -36,6 +36,7 @@ export default function FeedbackPage() {
         const newErrors = {};
         if (!form.rating) newErrors.rating = '⭐ Please select a star rating.';
         if (!form.name.trim()) newErrors.name = '👤 Please enter your name.';
+        if (!form.location.trim()) newErrors.location = '📍 Please enter your city.';
         if (!form.text.trim()) newErrors.text = '✏️ Please write your review.';
         return newErrors;
     };
@@ -63,7 +64,7 @@ export default function FeedbackPage() {
             const data = await res.json();
             if (data.success) {
                 setSubmitted(true);
-                setForm({ name: '', email: '', rating: 0, text: '' });
+                setForm({ name: '', email: '', location: '', rating: 0, text: '' });
                 setErrors({});
             }
         } catch (e) {
@@ -174,6 +175,22 @@ export default function FeedbackPage() {
                                                         onChange={e => handleChange('email', e.target.value)}
                                                     />
                                                 </div>
+                                            </div>
+
+                                            {/* City */}
+                                            <div className="form-group">
+                                                <label className="form-label" htmlFor="reviewer-city">Your City *</label>
+                                                <input
+                                                    id="reviewer-city"
+                                                    className={`form-input ${errors.location ? styles.inputError : ''}`}
+                                                    type="text"
+                                                    placeholder="e.g. Faisalabad"
+                                                    value={form.location}
+                                                    onChange={e => handleChange('location', e.target.value)}
+                                                />
+                                                {errors.location && (
+                                                    <span className={styles.errorMsg}>{errors.location}</span>
+                                                )}
                                             </div>
 
                                             {/* Review Text */}

@@ -35,7 +35,7 @@ function StarRating({ value, onChange, readOnly = false }) {
 export default function ReviewSection({ showForm = false }) {
     const [reviews, setReviews] = useState(staticReviews);
     const [current, setCurrent] = useState(0);
-    const [form, setForm] = useState({ name: '', email: '', rating: 0, text: '' });
+    const [form, setForm] = useState({ name: '', email: '', location: '', rating: 0, text: '' });
     const [submitting, setSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
@@ -95,7 +95,7 @@ export default function ReviewSection({ showForm = false }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.name || !form.rating || !form.text) {
+        if (!form.name || !form.rating || !form.text || !form.location) {
             return;
         }
         setSubmitting(true);
@@ -108,7 +108,7 @@ export default function ReviewSection({ showForm = false }) {
             const data = await res.json();
             if (data.success) {
                 setSubmitted(true);
-                setForm({ name: '', email: '', rating: 0, text: '' });
+                setForm({ name: '', email: '', location: '', rating: 0, text: '' });
                 fetchReviews();
             }
         } catch (e) {
@@ -124,6 +124,25 @@ export default function ReviewSection({ showForm = false }) {
     const truncateText = (text, limit = 100) => {
         if (text.length <= limit) return text;
         return text.slice(0, limit) + '...';
+    };
+
+    const getCityOnly = (loc) => {
+        if (!loc) return 'Faisalabad';
+        const parts = loc.split(',').map(p => p.trim()).filter(Boolean);
+        if (parts.length > 2) {
+            // If it's something like "Area, City, Country" or "House, Area, City, Country"
+            // We usually want the city which is 2nd to last if last is country
+            if (parts[parts.length - 1].toLowerCase() === 'pakistan') {
+                return parts[parts.length - 2];
+            }
+            return parts[parts.length - 1];
+        }
+        if (parts.length === 2) {
+            // "City, Country" -> return City
+            if (parts[1].toLowerCase() === 'pakistan') return parts[0];
+            return parts[0];
+        }
+        return parts[0];
     };
 
     return (
@@ -161,7 +180,7 @@ export default function ReviewSection({ showForm = false }) {
                                     </div>
                                     <div>
                                         <strong className={styles.reviewerName}>{review.name}</strong>
-                                        <span className={styles.reviewerLoc}>📍 {review.location || 'Faisalabad'}</span>
+                                        <span className={styles.reviewerLoc}>📍 {getCityOnly(review.location)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -198,7 +217,7 @@ export default function ReviewSection({ showForm = false }) {
                                     </div>
                                     <div>
                                         <strong className={styles.reviewerName} style={{ fontSize: 17 }}>{selectedReview.name}</strong>
-                                        <span className={styles.reviewerLoc} style={{ fontSize: 14 }}>📍 {selectedReview.location || 'Faisalabad'}</span>
+                                        <span className={styles.reviewerLoc} style={{ fontSize: 14 }}>📍 {getCityOnly(selectedReview.location)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -246,6 +265,10 @@ export default function ReviewSection({ showForm = false }) {
                                 <div className="form-group">
                                     <label className="form-label" htmlFor="reviewer-email">Email</label>
                                     <input id="reviewer-email" className="form-input" type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} placeholder="Optional" />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label" htmlFor="reviewer-city">City *</label>
+                                    <input id="reviewer-city" className="form-input" type="text" value={form.location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} placeholder="e.g. Faisalabad" required />
                                 </div>
                             </div>
                             <div className="form-group">

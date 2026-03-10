@@ -77,7 +77,21 @@ export default function AdminReviewTable({ reviews, onDelete }) {
                             {/* Location */}
                             <td>
                                 <span style={{ fontSize: 13, color: '#666' }}>
-                                    📍 {review.location || 'N/A'}
+                                    📍 {(() => {
+                                        const loc = review.location || 'N/A';
+                                        const parts = loc.split(',').map(p => p.trim()).filter(Boolean);
+                                        if (parts.length > 2) {
+                                            if (parts[parts.length - 1].toLowerCase() === 'pakistan') {
+                                                return parts[parts.length - 2];
+                                            }
+                                            return parts[parts.length - 1];
+                                        }
+                                        if (parts.length === 2) {
+                                            if (parts[1].toLowerCase() === 'pakistan') return parts[0];
+                                            return parts[0];
+                                        }
+                                        return parts[0];
+                                    })()}
                                 </span>
                             </td>
                             {/* Date */}

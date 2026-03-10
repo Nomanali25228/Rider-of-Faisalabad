@@ -169,7 +169,19 @@ export default function TrackOrderPage() {
                     name: order.fullName,
                     rating: reviewForm.rating,
                     text: reviewForm.text,
-                    location: order.dropAddress.split(',').pop().trim() || 'Faisalabad'
+                    location: (() => {
+                        if (!order.dropAddress) return 'Faisalabad';
+                        const parts = order.dropAddress.split(',').map(p => p.trim()).filter(Boolean);
+                        // If standard address format (House, Area, City, Country)
+                        if (parts.length >= 3) {
+                            // 2nd to last is usually city if last is country
+                            if (parts[parts.length - 1].toLowerCase() === 'pakistan') {
+                                return parts[parts.length - 2];
+                            }
+                            return parts[parts.length - 1];
+                        }
+                        return parts[0];
+                    })()
                 }),
             });
             const data = await res.json();
