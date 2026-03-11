@@ -245,8 +245,9 @@
 .lightboxImage {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
+    background: #f8f8f8;
 }
 
 .lightboxRight {
@@ -382,7 +383,7 @@
     }
 
     .lightboxLeft {
-        height: 300px;
+        height: 350px;
         flex: none;
     }
 
@@ -446,11 +447,16 @@
     }
 
     .lightboxCard {
-        border-radius: 20px;
+        border-radius: 24px;
+        max-width: 480px;
     }
 
     .lightboxLeft {
-        height: 240px;
+        height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f8f8;
     }
 
     .lightboxHeader h3 {

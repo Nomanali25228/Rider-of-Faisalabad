@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FiCamera, FiShoppingCart, FiX, FiCheck, FiPackage } from 'react-icons/fi';
 import { useRouter } from 'next/router';
 import styles from './gallery.module.css';
@@ -118,66 +118,69 @@ export default function GalleryPage() {
                 </section>
 
                 {/* Lightbox */}
-                {selected && (
-                    <motion.div
-                        className={styles.lightbox}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setSelected(null)}
-                    >
+                <AnimatePresence>
+                    {selected && (
                         <motion.div
-                            className={styles.lightboxCard}
-                            initial={{ y: 50, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            onClick={e => e.stopPropagation()}
+                            className={styles.lightbox}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelected(null)}
                         >
-                            <button className={styles.topCloseBtn} onClick={() => setSelected(null)}>
-                                <FiX size={24} />
-                            </button>
+                            <motion.div
+                                className={styles.lightboxCard}
+                                initial={{ y: 50, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: 50, opacity: 0 }}
+                                onClick={e => e.stopPropagation()}
+                            >
+                                <button className={styles.topCloseBtn} onClick={() => setSelected(null)}>
+                                    <FiX size={24} />
+                                </button>
 
-                            <div className={styles.lightboxContent}>
-                                <div className={styles.lightboxLeft}>
-                                    <img src={selected.image} alt={selected.label} className={styles.lightboxImage} />
-                                </div>
-                                <div className={styles.lightboxRight}>
-                                    <div className={styles.lightboxHeader}>
-                                        <span className={styles.categoryBadge}>{selected.category}</span>
-                                        <h3>{selected.label}</h3>
-                                        <div className={styles.lightboxPrice}>RS. {selected.price}</div>
+                                <div className={styles.lightboxContent}>
+                                    <div className={styles.lightboxLeft}>
+                                        <img src={selected.image} alt={selected.label} className={styles.lightboxImage} />
                                     </div>
-
-                                    <div className={styles.productFeatures}>
-                                        <div className={styles.feature}>
-                                            <FiCheck className={styles.featureIcon} />
-                                            <span>Same day delivery available</span>
+                                    <div className={styles.lightboxRight}>
+                                        <div className={styles.lightboxHeader}>
+                                            <span className={styles.categoryBadge}>{selected.category}</span>
+                                            <h3>{selected.label}</h3>
+                                            <div className={styles.lightboxPrice}>RS. {selected.price}</div>
                                         </div>
-                                        <div className={styles.feature}>
-                                            <FiCheck className={styles.featureIcon} />
-                                            <span>Premium Quality Assurance</span>
+
+                                        <div className={styles.productFeatures}>
+                                            <div className={styles.feature}>
+                                                <FiCheck className={styles.featureIcon} />
+                                                <span>Same day delivery available</span>
+                                            </div>
+                                            <div className={styles.feature}>
+                                                <FiCheck className={styles.featureIcon} />
+                                                <span>Premium Quality Assurance</span>
+                                            </div>
+                                        </div>
+
+                                        <p className={styles.lightboxDesc}>
+                                            {selected.description}
+                                        </p>
+
+                                        <div className={styles.lightboxActions}>
+                                            <button
+                                                className={`${styles.mainOrderBtn}`}
+                                                onClick={() => handleOrderNow(selected)}
+                                            >
+                                                <FiPackage size={18} /> Order This Now
+                                            </button>
+                                            <button className={styles.secondaryBtn} onClick={() => setSelected(null)}>
+                                                Continue Shopping
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <p className={styles.lightboxDesc}>
-                                        {selected.description}
-                                    </p>
-
-                                    <div className={styles.lightboxActions}>
-                                        <button
-                                            className={`${styles.mainOrderBtn}`}
-                                            onClick={() => handleOrderNow(selected)}
-                                        >
-                                            <FiPackage size={18} /> Order This Now
-                                        </button>
-                                        <button className={styles.secondaryBtn} onClick={() => setSelected(null)}>
-                                            Continue Shopping
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
+                    )}
+                </AnimatePresence>
             </div>
         </>
     );

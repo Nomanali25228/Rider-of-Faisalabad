@@ -147,43 +147,8 @@ export default function HomePage() {
                 {/* Hero */}
                 <Hero />
 
-                {/* Why Choose Us */}
-                <section className="section" style={{ background: 'white' }}>
-                    <div className="container">
-                        <motion.div
-                            className="text-center"
-                            variants={fadeUp}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                        >
-                            <span className="section-badge"><FiStar size={12} /> Why Choose Us</span>
-                            <h2 className="section-title">Faisalabad&apos;s Most <span>Trusted Rider</span></h2>
-                            <p className="section-subtitle">We&apos;ve built our reputation on reliability, speed and care for every parcel.</p>
-                        </motion.div>
-
-                        <div className={styles.whyGrid}>
-                            {whyUs.map(({ icon, title, desc }, i) => (
-                                <motion.div
-                                    key={title}
-                                    className={styles.whyCard}
-                                    variants={fadeUp}
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    custom={i}
-                                    viewport={{ once: true }}
-                                >
-                                    <div className={styles.whyIcon}>{icon}</div>
-                                    <h3 className={styles.whyTitle}>{title}</h3>
-                                    <p className={styles.whyDesc}>{desc}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
                 {/* Our Shop Preview */}
-                <section className="section" style={{ background: 'var(--bg)' }}>
+                <section className="section" style={{ background: 'white' }}>
                     <div className="container">
                         <motion.div
                             className="text-center"
@@ -232,6 +197,41 @@ export default function HomePage() {
                             <Link href="/gallery" className="btn btn-teal btn-lg">
                                 View Our Full Shop
                             </Link>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Why Choose Us */}
+                <section className="section" style={{ background: 'var(--bg)' }}>
+                    <div className="container">
+                        <motion.div
+                            className="text-center"
+                            variants={fadeUp}
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true }}
+                        >
+                            <span className="section-badge"><FiStar size={12} /> Why Choose Us</span>
+                            <h2 className="section-title">Faisalabad&apos;s Most <span>Trusted Rider</span></h2>
+                            <p className="section-subtitle">We&apos;ve built our reputation on reliability, speed and care for every parcel.</p>
+                        </motion.div>
+
+                        <div className={styles.whyGrid}>
+                            {whyUs.map(({ icon, title, desc }, i) => (
+                                <motion.div
+                                    key={title}
+                                    className={styles.whyCard}
+                                    variants={fadeUp}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    custom={i}
+                                    viewport={{ once: true }}
+                                >
+                                    <div className={styles.whyIcon}>{icon}</div>
+                                    <h3 className={styles.whyTitle}>{title}</h3>
+                                    <p className={styles.whyDesc}>{desc}</p>
+                                </motion.div>
+                            ))}
                         </div>
                     </div>
                 </section>
