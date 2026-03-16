@@ -59,8 +59,8 @@ const fadeUp = {
     }),
 };
 
-// Curate a mixed selection of items for homepage
-const featuredProductIds = [1, 10, 3, 6, 13, 22, 14, 33];
+// Curate a mixed selection of items for homepage (Updated for Eid)
+const featuredProductIds = [58, 57, 56, 55, 16, 19, 21, 25];
 const featuredProducts = (galleryItems || []).filter(item => featuredProductIds.includes(item.id));
 
 export default function HomePage() {
