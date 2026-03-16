@@ -239,8 +239,8 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
         if (selectedProducts.length === 0 && !form.pickupAddress.trim()) newErrors.pickupAddress = '📍 Please enter the pickup address.';
         if (!form.dropAddress.trim()) newErrors.dropAddress = '📍 Please enter the drop/delivery address.';
         if (selectedProducts.length === 0 && !form.parcelType) newErrors.parcelType = '📦 Please select a parcel type.';
-        if (form.deliveryType === 'Normal' && !form.deliveryDate) {
-            newErrors.deliveryDate = '📅 Please select a preferred delivery date.';
+        if (!form.deliveryDate) {
+            newErrors.deliveryDate = form.deliveryType === 'Same Day' ? '🕒 Please select a preferred delivery time.' : '📅 Please select a preferred delivery date & time.';
         }
 
 
@@ -314,7 +314,16 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                 <p className={styles.successNote}>
                     A confirmation email has been sent. Our team will respond within <strong>6 hours</strong>.
                 </p>
-                <button className="btn btn-teal" onClick={() => setTrackingId(null)}>
+                <Link href={`/track-order?id=${trackingId}`}>
+                    <button className="btn btn-teal" style={{ marginTop: '10px' }}>
+                        Track Your Order
+                    </button>
+                </Link>
+                <button 
+                    className="btn btn-outline" 
+                    style={{ display: 'block', margin: '15px auto 0', color: '#666', border: 'none', background: 'transparent', cursor: 'pointer', textDecoration: 'underline' }} 
+                    onClick={() => setTrackingId(null)}
+                >
                     Place Another Order
                 </button>
             </motion.div>
@@ -532,29 +541,30 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                         {form.deliveryType === 'Normal' && '📦 Standard delivery within 24 to 48 hours.'}
                     </motion.div>
 
-                    <AnimatePresence>
-                        {form.deliveryType === 'Normal' && (
-                            <motion.div
-                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
-                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                className={styles.datePickerSection}
-                            >
-                                <label className="form-label" htmlFor="deliveryDate">
-                                    <FiCalendar size={14} /> Preferred Delivery Date & Time <span className={styles.req}>*</span>
-                                </label>
-                                <input
-                                    id="deliveryDate"
-                                    name="deliveryDate"
-                                    type="datetime-local"
-                                    className={`form-input ${errors.deliveryDate ? styles.inputError : ''}`}
-                                    min={new Date().toISOString().slice(0, 16)}
-                                    value={form.deliveryDate}
-                                    onChange={handleChange}
-                                />
-                                {errors.deliveryDate && <span className={styles.errorMsg}>{errors.deliveryDate}</span>}
-                            </motion.div>
-                        )}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={form.deliveryType}
+                            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                            animate={{ opacity: 1, height: 'auto', marginTop: 16 }}
+                            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                            className={styles.datePickerSection}
+                        >
+                            <label className="form-label" htmlFor="deliveryDate">
+                                {form.deliveryType === 'Same Day' ? <FiClock size={14} /> : <FiCalendar size={14} />} 
+                                {form.deliveryType === 'Same Day' ? ' Preferred Delivery Time (Today)' : ' Preferred Delivery Date & Time'} 
+                                <span className={styles.req}>*</span>
+                            </label>
+                            <input
+                                id="deliveryDate"
+                                name="deliveryDate"
+                                type={form.deliveryType === 'Same Day' ? 'time' : 'datetime-local'}
+                                className={`form-input ${errors.deliveryDate ? styles.inputError : ''}`}
+                                min={form.deliveryType === 'Normal' ? new Date().toISOString().slice(0, 16) : undefined}
+                                value={form.deliveryDate}
+                                onChange={handleChange}
+                            />
+                            {errors.deliveryDate && <span className={styles.errorMsg}>{errors.deliveryDate}</span>}
+                        </motion.div>
                     </AnimatePresence>
                 </div>
 
@@ -576,96 +586,16 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
 
                 {/* Payment & Attachment Upload */}
                 <div className={`form-group ${styles.fullWidth}`} id="attachment" style={{ marginTop: '20px' }}>
-                    {selectedProducts && selectedProducts.length > 0 ? (
-                        <div className={styles.paymentBox}>
-                            <h4 className={styles.paymentTitle}>
-                                <FiPackage size={18} /> Pre-Book Payment
-                            </h4>
-
-                            <div className={styles.estimateBox}>
-                                <span className={styles.estimateLabel}>Items & Delivery Estimate:</span>
-                                <div className={styles.estimateValue}>
-                                    {getItemsTotalText()}
-                                </div>
-                            </div>
-
-                            <p className={styles.paymentText}>
-                                If you&apos;d like to pay immediately, please transfer to any of the accounts below and upload the screenshot. It will speed up your order!
-                            </p>
-
-                            <div className={styles.accountsGrid}>
-                                <div className={styles.accountCard}>
-                                    <strong className={styles.accountLabel}>JazzCash / EasyPaisa</strong>
-                                    <div className={styles.accountDetail}>
-                                        <span className={styles.accountNumber}>0302-7201810</span>
-                                        <button type="button" className={styles.copyBtn} onClick={() => copyToClipboard('03027201810')} title="Copy Number">
-                                            <FiCopy size={14} />
-                                        </button>
-                                    </div>
-                                    <div className={styles.accountTitle}>Title: WAQAS AHMAD</div>
-                                </div>
-
-                                <div className={styles.accountCard}>
-                                    <strong className={styles.accountLabel}>HBL Bank</strong>
-                                    <div className={styles.accountDetail}>
-                                        <span className={styles.accountNumber}>14667905719303</span>
-                                        <button type="button" className={styles.copyBtn} onClick={() => copyToClipboard('14667905719303')} title="Copy Number">
-                                            <FiCopy size={14} />
-                                        </button>
-                                    </div>
-                                    <div className={styles.accountTitle}>Title: WAQAS AHMAD</div>
-                                </div>
-                            </div>
-
-                            <label className="form-label">
-                                <FiUpload size={14} /> Upload Payment Screenshot
-                            </label>
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                style={{ display: 'none' }}
-                                onChange={handleFileChange}
-                                accept="image/*,.pdf"
-                            />
-                            {!attachment ? (
-                                <div
-                                    className={styles.uploadZone}
-                                    onClick={() => fileInputRef.current?.click()}
-                                >
-                                    <FiUpload size={24} className={styles.uploadIcon} />
-                                    <span className={styles.uploadText}>
-                                        Click here to upload payment screenshot
-                                    </span>
-                                    <span className={styles.uploadSubtext}>
-                                        JPG, PNG (Max 5MB)
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className={styles.filePreview}>
-                                    <FiPackage size={18} color="#2F8F83" />
-                                    <span className={styles.fileName}>
-                                        {attachment.name.length > 20
-                                            ? attachment.name.substring(0, 15) + '...' + attachment.name.split('.').pop()
-                                            : attachment.name}
-                                    </span>
-                                    <button type="button" className={styles.deleteVoice} onClick={() => setAttachment(null)}>
-                                        <FiTrash2 size={16} />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ) : (
-                        <div className={styles.costNoticeBox}>
-                            <FiClock size={32} color="#2F8F83" />
-                            <h4 className={styles.costNoticeTitle}>Estimated Cost</h4>
-                            <p className={styles.costNoticeUrdu} dir="rtl">
-                                بکنگ کے 30 منٹ کے اندر آپ کو کل چارجز بتا دیے جائیں گے۔
-                            </p>
-                            <p className={styles.costNoticeEnglish}>
-                                Total delivery cost will be shared with you within 30 minutes of order submission.
-                            </p>
-                        </div>
-                    )}
+                    <div className={styles.costNoticeBox}>
+                        <FiClock size={32} color="#2F8F83" />
+                        <h4 className={styles.costNoticeTitle}>Estimated Cost</h4>
+                        <p className={styles.costNoticeUrdu} dir="rtl" style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                            جیسے ہی آپ آرڈر کریں گے 10 سے 20 منٹ کے اندر آپ کو کل چارجز بتا دیے جائیں گے۔
+                        </p>
+                        <p className={styles.costNoticeEnglish} style={{ fontSize: '15px' }}>
+                            Once you place the order, you will be told the total cost of your order within 10-20 minutes.
+                        </p>
+                    </div>
                 </div>
 
                 {/* Live Voice Note (WhatsApp Style) */}

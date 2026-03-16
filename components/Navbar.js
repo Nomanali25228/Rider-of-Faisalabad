@@ -53,7 +53,7 @@ export default function Navbar() {
                         <div className={styles.marqueeItem}>
                             <span>🎉 WELCOME TO RIDER OF FAISALABAD!</span>
                             <span className={styles.separator}>★</span>
-                            <span>NO EXTRA DELIVERY CHARGES</span>
+                            <span>NO EXTRA DELIVERY CHARGES IN FAISALABAD</span>
                             <span className={styles.separator}>★</span>
                             <span>FASTEST DELIVERY IN FAISALABAD</span>
                             <span className={styles.separator}>★</span>
@@ -64,7 +64,7 @@ export default function Navbar() {
                         <div className={styles.marqueeItem}>
                             <span>🎉 WELCOME TO RIDER OF FAISALABAD!</span>
                             <span className={styles.separator}>★</span>
-                            <span>NO EXTRA DELIVERY CHARGES</span>
+                            <span>NO EXTRA DELIVERY CHARGES IN FAISALABAD</span>
                             <span className={styles.separator}>★</span>
                             <span>FASTEST DELIVERY IN FAISALABAD</span>
                             <span className={styles.separator}>★</span>

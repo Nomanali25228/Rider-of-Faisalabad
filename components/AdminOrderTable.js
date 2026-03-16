@@ -358,7 +358,13 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                             const items = JSON.parse(selected.productDetails);
                                             const itemsArray = Array.isArray(items) ? items : [items];
                                             return itemsArray.map((item, idx) => (
-                                                <div key={idx} className={styles.premiumItem}>
+                                                <div 
+                                                    key={idx} 
+                                                    className={styles.premiumItem} 
+                                                    onClick={() => setPreviewImage(item.image)}
+                                                    style={{cursor: 'pointer'}}
+                                                    title="Click to view full image"
+                                                >
                                                     <img src={item.image} alt={item.label} className={styles.premiumItemThumb} />
                                                     <div className={styles.premiumItemInfo}>
                                                         <strong>{item.label}</strong>
@@ -484,7 +490,13 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                                 <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '15px', maxHeight: '150px', overflowY: 'auto' }}>
                                                     {items.map((item, idx) => (
                                                         <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: idx === items.length - 1 ? 0 : '8px' }}>
-                                                            <img src={item.image} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover' }} alt="" />
+                                                            <img 
+                                                                src={item.image} 
+                                                                style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', cursor: 'pointer' }} 
+                                                                alt={item.label}
+                                                                onClick={() => setPreviewImage(item.image)}
+                                                                title="Click to view full image"
+                                                            />
                                                             <div style={{ flex: 1 }}>
                                                                 <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>{item.label}</div>
                                                                 <div style={{ fontSize: '12px', color: '#64748b' }}>RS. {item.price}</div>
