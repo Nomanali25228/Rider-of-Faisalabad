@@ -60,8 +60,10 @@ const fadeUp = {
 };
 
 // Curate a mixed selection of items for homepage (Updated for Eid)
-const featuredProductIds = [58, 57, 56, 55, 16, 19, 21, 25];
-const featuredProducts = (galleryItems || []).filter(item => featuredProductIds.includes(item.id));
+const featuredProductIds = [62, 61, 58, 57, 56, 55, 16, 19];
+const featuredProducts = (galleryItems || [])
+    .filter(item => featuredProductIds.includes(item.id))
+    .sort((a, b) => featuredProductIds.indexOf(a.id) - featuredProductIds.indexOf(b.id));
 
 export default function HomePage() {
     const router = useRouter();
