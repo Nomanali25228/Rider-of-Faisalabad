@@ -138,6 +138,10 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
         handleStatusChange(acceptOrderId, 'Accepted', { totalPrice: totalPrice });
     };
 
+    const skipAcceptance = () => {
+        handleStatusChange(acceptOrderId, 'Accepted', { totalPrice: '' });
+    };
+
     return (
         <div className={styles.wrapper}>
             {/* Table */}
@@ -534,6 +538,14 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                             </div>
                             <div className={styles.modalFooter}>
                                 <button className={styles.cancelBtn} onClick={() => setShowAcceptModal(false)}>Cancel</button>
+                                <button
+                                    className={styles.skipBtn}
+                                    onClick={skipAcceptance}
+                                    disabled={updating === acceptOrderId}
+                                    title="Accept order without setting a price"
+                                >
+                                    ⏭ Skip & Accept
+                                </button>
                                 <button
                                     className={styles.confirmBtn}
                                     style={{ background: '#2F8F83' }}
