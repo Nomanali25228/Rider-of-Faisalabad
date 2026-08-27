@@ -47,7 +47,7 @@ export default async function handler(req, res) {
 
         // Send confirmation email to admin
         try {
-            if (process.env.SMTP_HOST) {
+            if (process.env.SMTP_HOST || process.env.SMTP_USER) {
                 await sendPaymentNotification(order, resultUrl);
             }
         } catch (emailErr) {
@@ -62,10 +62,14 @@ export default async function handler(req, res) {
 }
 
 async function sendPaymentNotification(order, screenshotUrl) {
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const port = Number(process.env.SMTP_PORT) || 465;
+    const secure = process.env.SMTP_PORT ? process.env.SMTP_PORT == 465 : true;
+
     const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_PORT == 465,
+        host,
+        port,
+        secure,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS

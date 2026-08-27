@@ -49,7 +49,7 @@ export default async function handler(req, res) {
 
         // Send status update emails
         try {
-            if (process.env.SMTP_HOST && updatedOrder && updatedOrder.email) {
+            if ((process.env.SMTP_HOST || process.env.SMTP_USER) && updatedOrder && updatedOrder.email) {
                 if (status === 'Accepted') {
                     await sendAcceptedEmail(updatedOrder);
                 } else if (status === 'Rejected') {
@@ -72,10 +72,14 @@ export default async function handler(req, res) {
 }
 
 async function getTransporter() {
+    const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+    const port = Number(process.env.SMTP_PORT) || 465;
+    const secure = process.env.SMTP_PORT ? process.env.SMTP_PORT == 465 : true;
+
     return nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_PORT == 465,
+        host,
+        port,
+        secure,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS

@@ -162,6 +162,13 @@ export default function DashboardPage() {
             const data = await res.json();
             if (data.success) {
                 toast.success('Deleted successfully');
+                if (type === 'orders') {
+                    setOrders(prev => prev.filter(o => o._id !== id && o.id !== id && o.trackingId !== id));
+                } else if (type === 'contact') {
+                    setContacts(prev => prev.filter(c => c._id !== id && c.id !== id));
+                } else if (type === 'reviews') {
+                    setReviews(prev => prev.filter(r => r._id !== id && r.id !== id));
+                }
                 fetchDashboardData(page, filter);
             } else {
                 toast.error(data.message || 'Failed to delete');

@@ -1,4 +1,4 @@
-import { githubStore } from '../../../lib/github';
+import { deleteContact } from '../../../lib/contactStore';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -15,10 +15,11 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ success: false, message: 'ID required' });
 
     try {
-        await githubStore.remove('contacts', id);
+        await deleteContact(id);
         return res.status(200).json({ success: true, message: 'Inquiry deleted successfully' });
     } catch (err) {
         console.error('Delete inquiry error:', err);
         return res.status(500).json({ success: false, message: 'Failed to delete inquiry' });
     }
 }
+

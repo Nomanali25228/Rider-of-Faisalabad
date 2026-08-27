@@ -1,4 +1,4 @@
-import { githubStore } from '../../../lib/github';
+import { deleteReview } from '../../../lib/reviewStore';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -15,10 +15,11 @@ export default async function handler(req, res) {
     if (!id) return res.status(400).json({ success: false, message: 'ID required' });
 
     try {
-        await githubStore.remove('reviews', id);
+        await deleteReview(id);
         return res.status(200).json({ success: true, message: 'Review deleted successfully' });
     } catch (err) {
         console.error('Delete review error:', err);
         return res.status(500).json({ success: false, message: 'Failed to delete review' });
     }
 }
+
