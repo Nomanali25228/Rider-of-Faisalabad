@@ -133,6 +133,7 @@ export default function DashboardPage() {
             if (data.success) {
                 setOrders(prev => prev.map(o => (o._id === orderId || o.trackingId === orderId) ? { ...o, status: newStatus, ...extraData } : o));
                 toast.success(`Status updated to ${newStatus}`);
+                fetchDashboardData(page, filter, true);
                 return true;
             } else {
                 toast.error(data.message || 'Failed to update status.');

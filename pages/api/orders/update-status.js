@@ -204,28 +204,30 @@ async function sendRejectedEmail(order, reason) {
 
 async function sendDeliveredEmail(order) {
     const transporter = await getTransporter();
-    const feedbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://rider-of-faisalabad.vercel.app'}/track-order?id=${order.trackingId}`;
+    const trackingUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://riderofaisalabad.com'}/track-order?id=${order.trackingId}`;
 
     await transporter.sendMail({
         from: `"Rider of Faisalabad" <${process.env.SMTP_USER}>`,
         to: order.email,
         subject: `Parcel Delivered! — ${order.trackingId}`,
         html: `
-            <div style="font-family:sans-serif; max-width:500px; margin:0 auto; padding:20px; border:1px solid #eee; border-radius:10px;">
-                <h2 style="color:#2F8F83;">Successfully Delivered!</h2>
+            <div style="font-family:sans-serif; max-width:550px; margin:0 auto; padding:25px; border:1px solid #e5e7eb; border-radius:16px;">
+                <h2 style="color:#059669; text-align:center; margin-top:0;">🎉 Parcel Successfully Delivered!</h2>
                 <p>Hello <strong>${order.fullName}</strong>,</p>
-                <p>Your parcel <strong>${order.trackingId}</strong> has been successfully delivered to your destination.</p>
-                <p>We hope you had a great experience with our rider!</p>
-                <br/>
-                <div style="text-align:center;">
-                    <p><strong>Please share your feedback with us:</strong></p>
-                    <a href="${feedbackUrl}" style="background:#2F8F83; color:white; padding:12px 25px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">Leave a Review</a>
+                <p>Great news! Your parcel (Tracking ID: <strong style="color:#2F8F83;">${order.trackingId}</strong>) has been successfully delivered to your destination.</p>
+                <p>We hope you had a smooth and fast experience with our rider!</p>
+
+                <div style="background:#f0fdf4; border:1.5px solid #059669; padding:20px; border-radius:12px; margin:20px 0; text-align:center;">
+                    <p style="margin:0 0 10px 0; font-weight:bold; color:#065f46; font-size:16px;">⭐ How was your experience?</p>
+                    <p style="margin:0 0 15px 0; font-size:13px; color:#047857;">Please take a moment to leave a review on our live tracking page:</p>
+                    <a href="${trackingUrl}" style="background:#059669; color:white; padding:12px 25px; text-decoration:none; border-radius:8px; font-weight:bold; display:inline-block;">Leave a Review & View Details</a>
+                </div>
+
+                <div style="margin-top:20px; padding:15px; background:#f9fafb; border-radius:10px; border:1px solid #e5e7eb;">
+                    <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Need Help or Have Concerns?</strong> Contact us directly at <strong style="color:#2F8F83;">0306-9810032</strong>.</p>
                 </div>
                 <br/>
-                <p>Thank you for choosing Rider of Faisalabad!</p>
-                <div style="margin-top:15px; padding:15px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
-                    <p style="margin:0; font-size:14px; color:#444;">📞 <strong>Any concerns?</strong> If you faced any issue with your delivery or need further assistance, contact us at <strong style="color:#2F8F83;">0306-9810032</strong>. Your satisfaction matters to us!</p>
-                </div>
+                <p>Best Regards,<br/><strong>Rider of Faisalabad Team</strong></p>
             </div>
         `,
     });
