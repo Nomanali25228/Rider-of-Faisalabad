@@ -238,7 +238,6 @@ async function sendOrderEmails(order, products) {
         const paymentInfoHtml = order.totalPrice ? `
             <div style="margin:20px 0; padding:20px; background:#fdfaf0; border:1.2px solid #F4C542; border-radius:12px; text-align:center;">
                 <p style="margin:0 0 10px 0; font-weight:bold; color:#222;">Payment Required</p>
-                <div style="font-size:24px; font-weight:900; color:#2F8F83;">RS. ${order.totalPrice.toLocaleString()}</div>
                 <p style="font-size:13px; color:#666; margin-top:10px;">
                     ${hasPayment
                 ? '✅ Thank you for uploading the screenshot. We will verify it shortly.'
