@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { FiUpload, FiMic, FiSend, FiPackage, FiUser, FiPhone, FiMail, FiMapPin, FiFileText, FiMap, FiTrash2, FiSquare, FiCopy, FiCalendar, FiClock } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import styles from './OrderForm.module.css';
 import dynamic from 'next/dynamic';
 
@@ -31,6 +32,7 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
     const [form, setForm] = useState(initialState);
     const [loading, setLoading] = useState(false);
     const [trackingId, setTrackingId] = useState(null);
+    const [orderSummary, setCompletedOrder] = useState(null);
     const [mapMode, setMapMode] = useState(null);
     const [errors, setErrors] = useState({});
     const [attachment, setAttachment] = useState(null);
@@ -282,12 +284,26 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
             });
             const data = await res.json();
             if (data.success) {
+                const summary = {
+                    trackingId: data.trackingId,
+                    fullName: form.fullName,
+                    phone: form.phone,
+                    email: form.email,
+                    pickupAddress: form.pickupAddress,
+                    dropAddress: form.dropAddress,
+                    parcelType: form.parcelType,
+                    deliveryType: form.deliveryType,
+                    deliveryDate: form.deliveryDate,
+                    message: form.message,
+                    products: [...selectedProducts],
+                };
+                setCompletedOrder(summary);
                 setTrackingId(data.trackingId);
                 setForm(initialState);
                 deleteRecording();
                 setAttachment(null);
                 clearAllProducts();
-                toast.success('Order placed! Check your email for confirmation.');
+                toast.success('Order placed! Please confirm on WhatsApp.');
             } else {
                 toast.error(data.message || 'Something went wrong.');
             }
@@ -299,6 +315,36 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
     };
 
     if (trackingId) {
+        const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || '923027201810';
+
+        let itemsList = '';
+        if (orderSummary?.products && orderSummary.products.length > 0) {
+            itemsList = orderSummary.products.map(p => `• ${p.label || p.name} (${p.price ? 'RS. ' + p.price : ''})`).join('\n');
+        } else if (orderSummary?.parcelType) {
+            itemsList = `• Parcel: ${orderSummary.parcelType} (${orderSummary.deliveryType || 'Standard'})`;
+        }
+
+        const whatsappMessage = 
+`Assalam-o-Alaikum Rider of Faisalabad! 🚚
+
+I have placed an order on your website.
+
+🆔 *Tracking ID:* ${orderSummary?.trackingId || trackingId}
+👤 *Customer Name:* ${orderSummary?.fullName || ''}
+📞 *Phone:* ${orderSummary?.phone || ''}
+${orderSummary?.email ? `✉️ *Email:* ${orderSummary.email}\n` : ''}
+📦 *Items / Order:*
+${itemsList}
+
+📍 *Pickup:* ${orderSummary?.pickupAddress || 'N/A'}
+🏁 *Drop Address:* ${orderSummary?.dropAddress || 'N/A'}
+🚚 *Delivery Type:* ${orderSummary?.deliveryType || 'Normal'}
+${orderSummary?.deliveryDate ? `🕒 *Preferred Time/Date:* ${orderSummary.deliveryDate}\n` : ''}
+${orderSummary?.message ? `📝 *Special Note:* ${orderSummary.message}\n` : ''}
+⚠️ *Please confirm my order. Thank you!*`;
+
+        const whatsappUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(whatsappMessage)}`;
+
         return (
             <motion.div
                 ref={successRef}
@@ -311,8 +357,36 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                 <h3>Order Placed Successfully!</h3>
                 <p>Your tracking ID:</p>
                 <div className={styles.trackingId}>{trackingId}</div>
+
+                {/* WhatsApp Confirmation Alert & Button */}
+                <div className={styles.whatsappConfirmBox}>
+                    <div className={styles.whatsappAlertNotice}>
+                        <p className={styles.whatsappAlertUrdu} dir="rtl">
+                            ⚠️ آرڈر کنفرم کرنے کے لیے واٹس ایپ پر میسج کرنا ضروری ہے!
+                        </p>
+                        <p className={styles.whatsappAlertEnglish}>
+                            WhatsApp par message karna zaroori hai order confirm karne ke liye. Please click the button below to confirm immediately.
+                        </p>
+                    </div>
+
+                    <a
+                        href={whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.whatsappActionBtn}
+                        id="whatsapp-confirm-order-btn"
+                    >
+                        <FaWhatsapp size={24} />
+                        <span>Confirm Order on WhatsApp</span>
+                    </a>
+
+                    <span className={styles.whatsappSubText}>
+                        Opens WhatsApp with your full order details pre-filled. Just tap <strong>Send</strong>!
+                    </span>
+                </div>
+
                 <p className={styles.successNote}>
-                    A confirmation email has been sent. Our team will respond within <strong>6 hours</strong>.
+                    A confirmation email has also been sent. Our team will review your order promptly.
                 </p>
                 <Link href={`/track-order?id=${trackingId}`}>
                     <button className="btn btn-teal" style={{ marginTop: '10px' }}>
@@ -322,7 +396,10 @@ export default function OrderForm({ compact = false, onProductsChange, cartRefre
                 <button 
                     className="btn btn-outline" 
                     style={{ display: 'block', margin: '15px auto 0', color: '#666', border: 'none', background: 'transparent', cursor: 'pointer', textDecoration: 'underline' }} 
-                    onClick={() => setTrackingId(null)}
+                    onClick={() => {
+                        setTrackingId(null);
+                        setCompletedOrder(null);
+                    }}
                 >
                     Place Another Order
                 </button>

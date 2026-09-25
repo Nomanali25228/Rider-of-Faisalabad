@@ -4,6 +4,7 @@ import { saveOrder } from '../../../lib/ordersStore';
 import { uploadToCloudinary } from '../../../lib/cloudinary';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
+import path from 'path';
 
 export const config = {
     api: {
@@ -134,16 +135,50 @@ async function sendOrderEmails(order, products) {
     });
 
     const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://riderofaisalabad.com').replace(/\/$/, '');
 
-    const productHtml = (products && products.length > 0) ? `
+    // Process product images: embed local images via CID so Gmail displays them 100% reliably
+    const emailAttachments = [];
+    const processedProducts = (products || []).map((product, idx) => {
+        let imgSrc = product.image || '';
+        let displaySrc = '';
+
+        if (imgSrc.startsWith('/')) {
+            const relPath = imgSrc.startsWith('/') ? imgSrc.slice(1) : imgSrc;
+            const localDiskPath = path.join(process.cwd(), 'public', relPath);
+
+            if (fs.existsSync(localDiskPath)) {
+                const cidName = `prod_img_${idx}`;
+                emailAttachments.push({
+                    filename: path.basename(localDiskPath),
+                    path: localDiskPath,
+                    cid: cidName,
+                });
+                displaySrc = `cid:${cidName}`;
+            } else {
+                displaySrc = `${siteUrl}/${encodeURI(relPath)}`;
+            }
+        } else if (imgSrc.startsWith('http://') || imgSrc.startsWith('https://')) {
+            displaySrc = imgSrc;
+        }
+
+        return {
+            ...product,
+            displaySrc: displaySrc || `${siteUrl}/uploads/logo.png`
+        };
+    });
+
+    const productHtml = (processedProducts && processedProducts.length > 0) ? `
         <div style="background:#fdfaf0; padding:15px; border-radius:10px; border:1.2px solid #F4C542; margin:15px 0;">
-            <p style="margin:0 0 10px 0; font-weight:bold; color:#000;">Selected Shop Items:</p>
+            <p style="margin:0 0 10px 0; font-weight:bold; color:#000;">Selected Shop Items (${processedProducts.length}):</p>
             <table width="100%" style="border-collapse:collapse;">
-                ${products.map(product => `
+                ${processedProducts.map(product => `
                     <tr style="border-bottom:1px solid rgba(244,197,66,0.2);">
-                        <td width="60" style="padding:8px 0;"><img src="${product.image}" width="50" style="border-radius:6px;"/></td>
-                        <td style="padding:8px 10px;">
-                            <strong style="font-size:14px; color:#222;">${product.label}</strong><br/>
+                        <td width="70" style="padding:8px 0; vertical-align:middle;">
+                            <img src="${product.displaySrc}" alt="${product.label || 'Product'}" width="60" height="60" style="border-radius:8px; object-fit:cover; border:1px solid #e5e7eb; display:block;"/>
+                        </td>
+                        <td style="padding:8px 12px; vertical-align:middle;">
+                            <strong style="font-size:14px; color:#222; display:block;">${product.label}</strong>
                             <span style="color:#2F8F83; font-weight:bold; font-size:13px;">RS. ${product.price}</span>
                         </td>
                     </tr>
@@ -154,9 +189,21 @@ async function sendOrderEmails(order, products) {
 
     const attachmentsHtml = (order.voiceNoteUrl || order.attachmentUrl) ? `
         <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee;">
-            <p><strong>Attachments:</strong></p>
-            ${order.voiceNoteUrl ? `<a href="${order.voiceNoteUrl}" style="display:inline-block; background:#2F8F83; color:white; padding:8px 15px; text-decoration:none; border-radius:6px; margin-right:10px;">Play Voice Note</a>` : ''}
-            ${order.attachmentUrl ? `<a href="${order.attachmentUrl}" style="display:inline-block; background:#6366f1; color:white; padding:8px 15px; text-decoration:none; border-radius:6px;">View Attachment</a>` : ''}
+            <p style="margin:0 0 10px 0; font-weight:bold; color:#222;">Attachments & Uploads:</p>
+            ${order.attachmentUrl ? `
+                <div style="margin-bottom:12px;">
+                    <p style="margin:0 0 6px 0; font-size:13px; color:#555;">Uploaded Photo / Receipt:</p>
+                    <a href="${order.attachmentUrl}" target="_blank" style="text-decoration:none;">
+                        <img src="${order.attachmentUrl}" alt="Customer Upload" style="max-width:280px; max-height:220px; border-radius:8px; border:1.5px solid #e2e8f0; display:block; margin-bottom:8px; object-fit:cover;" />
+                    </a>
+                    <a href="${order.attachmentUrl}" target="_blank" style="display:inline-block; background:#6366f1; color:white; padding:8px 15px; text-decoration:none; border-radius:6px; font-size:13px; font-weight:bold;">View Full Attachment</a>
+                </div>
+            ` : ''}
+            ${order.voiceNoteUrl ? `
+                <div style="margin-top:10px;">
+                    <a href="${order.voiceNoteUrl}" target="_blank" style="display:inline-block; background:#2F8F83; color:white; padding:8px 15px; text-decoration:none; border-radius:6px; font-size:13px; font-weight:bold;">▶ Play Voice Note</a>
+                </div>
+            ` : ''}
         </div>
     ` : '';
 
@@ -165,6 +212,7 @@ async function sendOrderEmails(order, products) {
         from: `"Rider Booking" <${process.env.SMTP_USER}>`,
         to: adminEmail,
         subject: `New Order: ${order.trackingId} — ${order.fullName}`,
+        attachments: emailAttachments,
         html: `
             <div style="font-family:sans-serif; color:#444; line-height:1.6; max-width:600px;">
                 <h2 style="color:#2F8F83;">New Delivery Request</h2>
@@ -172,9 +220,9 @@ async function sendOrderEmails(order, products) {
                     <p><strong>Tracking ID:</strong> ${order.trackingId}</p>
                     <p><strong>Customer:</strong> ${order.fullName} (${order.phone})</p>
                     <hr style="border:0; border-top:1px solid #ddd;"/>
-                    <p><strong>Pickup:</strong> ${order.pickupAddress}</p>
-                    <p><strong>Drop-off:</strong> ${order.dropAddress}</p>
-                    <p><strong>Parcel:</strong> ${order.parcelType} (${order.deliveryType})</p>
+                    <p><strong>Pickup:</strong> ${order.pickupAddress || 'N/A'}</p>
+                    <p><strong>Drop-off:</strong> ${order.dropAddress || 'N/A'}</p>
+                    <p><strong>Parcel:</strong> ${order.parcelType || 'Standard'} (${order.deliveryType || 'Normal'})</p>
                     ${order.deliveryDate ? `<p><strong>Delivery Date:</strong> ${order.deliveryDate}</p>` : ''}
                     ${productHtml}
                     <p><strong>Instructions:</strong> ${order.message || 'N/A'}</p>
@@ -218,6 +266,7 @@ async function sendOrderEmails(order, products) {
             from: `"Rider of Faisalabad" <${process.env.SMTP_USER}>`,
             to: order.email,
             subject: `Order Received — ${order.trackingId}`,
+            attachments: emailAttachments,
             html: `
                 <div style="font-family:sans-serif; color:#444; line-height:1.6; max-width:600px; margin:0 auto; padding:20px; border:1px solid #eee; border-radius:15px;">
                     <h2 style="color:#2F8F83;">Order Placed Successfully!</h2>

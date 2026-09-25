@@ -151,7 +151,7 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                         <tr>
                             <th>Tracking ID</th>
                             <th>Customer</th>
-                            <th>Type</th>
+                            <th>Parcel / Item</th>
                             <th>Delivery</th>
                             <th>Status</th>
                             <th>Date</th>
@@ -197,7 +197,76 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                             <span>{order.phone}</span>
                                         </div>
                                     </td>
-                                    <td><span className={styles.parcelType}>{order.parcelType}</span></td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            {(() => {
+                                                let thumb = null;
+                                                let totalItems = 0;
+                                                try {
+                                                    const items = order.productDetails ? JSON.parse(order.productDetails) : [];
+                                                    const itemsArr = Array.isArray(items) ? items : [items];
+                                                    totalItems = itemsArr.length;
+                                                    if (itemsArr.length > 0 && itemsArr[0]?.image) {
+                                                        thumb = itemsArr[0].image;
+                                                    }
+                                                } catch (e) { }
+
+                                                if (!thumb && (order.paymentScreenshot || order.attachmentUrl)) {
+                                                    thumb = order.paymentScreenshot || order.attachmentUrl;
+                                                }
+
+                                                if (thumb) {
+                                                    return (
+                                                        <div style={{ position: 'relative', flexShrink: 0 }}>
+                                                            <img
+                                                                src={encodeURI(thumb)}
+                                                                alt="Order item"
+                                                                style={{
+                                                                    width: '46px',
+                                                                    height: '46px',
+                                                                    borderRadius: '8px',
+                                                                    objectFit: 'cover',
+                                                                    border: '1.5px solid #cbd5e1',
+                                                                    cursor: 'pointer',
+                                                                    display: 'block',
+                                                                    boxShadow: '0 2px 6px rgba(0,0,0,0.08)',
+                                                                }}
+                                                                onClick={(e) => { e.stopPropagation(); setPreviewImage(thumb); }}
+                                                                title="Click to view photo full size"
+                                                                onError={(e) => { e.target.style.display = 'none'; }}
+                                                            />
+                                                            {totalItems > 1 && (
+                                                                <span style={{
+                                                                    position: 'absolute',
+                                                                    bottom: '-4px',
+                                                                    right: '-4px',
+                                                                    background: '#2F8F83',
+                                                                    color: 'white',
+                                                                    fontSize: '10px',
+                                                                    fontWeight: 'bold',
+                                                                    borderRadius: '10px',
+                                                                    padding: '1px 5px',
+                                                                    lineHeight: '14px',
+                                                                    border: '1px solid white'
+                                                                }}>
+                                                                    +{totalItems - 1}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            })()}
+                                            <div>
+                                                <span className={styles.parcelType}>{order.parcelType || 'Standard'}</span>
+                                                {order.totalPrice && (
+                                                    <span style={{ display: 'block', fontSize: '11px', color: '#2F8F83', fontWeight: 'bold', marginTop: '2px' }}>
+                                                        RS. {Number(order.totalPrice).toLocaleString()}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         <span className={`${styles.deliveryBadge} ${order.deliveryType === 'Urgent' ? styles.urgent : order.deliveryType === 'Same Day' ? styles.sameDay : ''}`}>
                                             {order.deliveryType}
@@ -369,7 +438,12 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                                     style={{cursor: 'pointer'}}
                                                     title="Click to view full image"
                                                 >
-                                                    <img src={item.image} alt={item.label} className={styles.premiumItemThumb} />
+                                                    <img 
+                                                        src={encodeURI(item.image)} 
+                                                        alt={item.label} 
+                                                        className={styles.premiumItemThumb} 
+                                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                                    />
                                                     <div className={styles.premiumItemInfo}>
                                                         <strong>{item.label}</strong>
                                                         <span>RS. {item.price}</span>
@@ -392,7 +466,12 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                         className={styles.screenshotLink}
                                         onClick={() => setPreviewImage(selected.paymentScreenshot || selected.attachmentUrl)}
                                     >
-                                        <img src={selected.paymentScreenshot || selected.attachmentUrl} alt="Payment" className={styles.paymentImage} />
+                                        <img 
+                                            src={encodeURI(selected.paymentScreenshot || selected.attachmentUrl)} 
+                                            alt="Payment" 
+                                            className={styles.paymentImage} 
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                        />
                                         <div className={styles.imgOverlay}><FiEye /> Click to View Full Size</div>
                                     </div>
                                 </div>
@@ -495,11 +574,12 @@ export default function AdminOrderTable({ orders = [], onStatusChange, onDelete 
                                                     {items.map((item, idx) => (
                                                         <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: idx === items.length - 1 ? 0 : '8px' }}>
                                                             <img 
-                                                                src={item.image} 
+                                                                src={encodeURI(item.image)} 
                                                                 style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', cursor: 'pointer' }} 
                                                                 alt={item.label}
                                                                 onClick={() => setPreviewImage(item.image)}
                                                                 title="Click to view full image"
+                                                                onError={(e) => { e.target.style.display = 'none'; }}
                                                             />
                                                             <div style={{ flex: 1 }}>
                                                                 <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#334155' }}>{item.label}</div>
